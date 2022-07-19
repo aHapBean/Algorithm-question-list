@@ -1,4 +1,12 @@
-# Algorithm-question-list
+## **Algorithm learning TODO list**
+- 7.19上午
+  - SA,SAM 后缀数组解决问题
+  - 博弈论简单应用
+  - 以前有价值的机考题补题
+
+
+
+## Algorithm-question-list
 a list of some good programming questions I've done
 
 - OJ
