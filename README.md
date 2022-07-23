@@ -11,6 +11,7 @@ a list of some good programming questions I've done
 
 - OJ
   - [逆序数对变种 -> 离散化 + 树状数组 (小v来组队 ](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1534)
+  - [逆序数对变种 -> 思维题(排序](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1149)
   - [pq经典题("逐个"类题) (Max Fraction](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=14383)
   - ["逐个" (函数单调性](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1558)
   - [隐蔽单调栈 (删数字游戏](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1516)
