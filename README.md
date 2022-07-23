@@ -16,6 +16,8 @@ a list of some good programming questions I've done
   - ["逐个" (函数单调性](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1558)
   - [隐蔽单调栈 (删数字游戏](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1516)
   
+  - [思路 -> 解题 (应用题,dfs](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1642)
+  
 - 洛谷
   - [简化版区间第k小](https://www.luogu.com.cn/problem/P1168)
   
