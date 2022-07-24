@@ -1,8 +1,9 @@
 ## **Algorithm learning TODO list**
-- 7.19上午
-  - SA,SAM 后缀数组解决问题
-  - 博弈论简单应用
-  - 以前有价值的机考题补题
+- **TODO list**
+  - newcoder 两场练习赛补题
+  - ACM直径题目
+  - 最长公共子序列
+  - 可持久线段树可用来计数？
 
 
 
