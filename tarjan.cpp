@@ -128,3 +128,12 @@ void tarjan(int u){
         --tail;sz[color]++;
     }
 }
+0:00 E
+tarjan  / 2 dfs
+5:30 D
+
+9:31 C
+    
+13:30 J
+
+    17:00 I
