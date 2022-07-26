@@ -1,0 +1,98 @@
+<div style='text-align: center'>
+  <span style='font-size: 2.3em; font-weight: bold'>ACM常用算法整理</span>
+</div>
+<div style='text-align: right'>
+  <span style='font-size: 1.5em; font-weight: bold'>------by Kokushi Muso</span>
+</div>
+
+<div style='text-align: right'>
+  <span style='font-size: 1.5em; font-weight: bold'>2019.9     </span>
+</div>
+
+- 6 others
+  - 6.1 Java
+  - 6.2 vimrc
+  - 6.3 读入输出优化（小）
+
+#  6 others
+### 6.1 Java
+```
+import java.util.*;
+import java.math.*;
+import java.io.*;
+public class Main{
+	static Scanner sc = new Scanner(System.in);
+	public static void main(String[] args){     
+		BigInteger A = read();	//高精度小数：BigDecimal
+					            //转double：A.doubleValue()
+             //BigDecimal转BigInteger：A.toBigInteger()
+             //BigInteger转BigDecimal：A = new BigDecimal(B)
+             
+		BigInteger B = read();
+		BigInteger C = A.subtract(B);
+                //add,subtract,multiply,divide,mod
+				//gcd(BigInteger),pow(int)
+				//A.compareTo(B) 返回A-B的符号（-1、0、1）
+		System.out.println(C);
+	}
+	public static BigInteger read(){
+		String a = sc.next();		//读一行：nextLine()
+		BigInteger A = new BigInteger(a);
+		return A;
+	}
+}
+/*
+数组
+int a[] = new int[100];
+长度：数组a.length 字符串a.length()
+
+保留小数位数
+double a=1.0;
+System.out.println(String.format("%.2f",a));
+
+文件IO
+InputStream in = new FileInputStream("test.in");
+Scanner cin = new Scanner(in);
+PrintStream out = new PrintStream("test.out");
+
+重定向
+System.setIn(in);
+System.setOut(out);
+*/
+
+```
+### 6.2 vimrc
+
+```
+imap [ []<LEFT>
+imap ( ()<LEFT>
+imap { {}<LEFT>
+inoremap " ""<LEFT>
+inoremap ' ''<LEFT>
+set mouse=a
+set number
+set ts=4
+set autoindent
+imap <F1> <ESC>:w %<cr>i
+imap <F3> <ESC>:w %<cr>:!g++ % -o %< -std=c++14<cr>:!./%< < in > out<cr>:!gedit out<cr>i
+imap <F5> <ESC>:!./%< < in > out<cr>:!gedit out<cr>i
+```
+
+### 6.3 读入输出优化（小）
+```
+ll in()
+{
+	ll re=0,f=1;char x=getchar();
+	while(x<'0'||x>'9'){if(x=='-')f=-1;x=getchar();}
+	while(x>='0'&&x<='9')re=re*10+x-48,x=getchar();
+	return re*f;
+}
+void out(ll x)
+{
+	if(x<0)putchar('-'),x=-x;
+	if(!x){putchar('0');return;}
+	char z[21],ct=0;
+	while(x){z[++ct]=x%10+48,x/=10;}
+	while(ct){putchar(z[ct]);--ct;}
+}
+```

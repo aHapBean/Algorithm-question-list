@@ -1,0 +1,3212 @@
+<div style='text-align: center'>
+  <span style='font-size: 2.3em; font-weight: bold'>ACM常用算法整理</span>
+</div>
+<div style='text-align: right'>
+  <span style='font-size: 1.5em; font-weight: bold'>------by Kokushi Muso</span>
+</div>
+
+<div style='text-align: right'>
+  <span style='font-size: 1.5em; font-weight: bold'>2019.9     </span>
+</div>
+
+- 1 mathematics
+  - 1.1 素数相关
+    - 1.1.1 埃氏筛
+    - 1.1.2 线性筛
+    - 1.1.3 pollard-rho
+  - 1.2 gcd相关
+    - 1.2.1 ex_gcd
+    - 1.2.2 类欧几里德
+  - 1.3 函数相关
+    - 1.3.1 欧拉函数
+    - 1.3.2 莫比乌斯函数
+  - 1.4 筛法
+    - 1.4.1 杜教筛
+    - 1.4.2 min_25筛
+  - 1.5 同余
+    - 1.5.1 高斯消元
+    - 1.5.2 BSGS
+    - 1.5.3 ex_BSGS
+    - 1.5.4 原根
+    - 1.5.5 中国剩余定理
+    - 1.5.6 二次剩余
+  - 1.6 组合数
+  - 1.7 单纯形
+  - 1.8 多项式
+    - 1.8.1 FFT
+    - 1.8.2 NTT
+    - 1.8.3 任意模数FFT
+    - 1.8.4 FWT
+    - 1.8.5 多项式求逆
+    - 1.8.6 多项式取模
+    - 1.8.7 多项式开根
+    - 1.8.8 多项式ln
+    - 1.8.9 多项式exp
+    - 1.8.10 多点求值
+    - 1.8.11 拉格朗日插值
+    - 1.8.12 K阶齐次线性递推
+    - 1.8.13 BM算法
+  - 1.9 pell方程
+  - 1.10 一元三次方程求根公式
+  - 1.11 simpson积分
+  - 1.12 整数划分
+  - 1.13 min-max容斥
+  - 1.14 线性基
+  - 1.15 Stern-Brocot树
+  - 1.16 数相关
+    - 1.16.1 Stirling数
+    - 1.16.2 Catalan数
+    - 1.16.3 Fibonacci数
+    - 1.16.4 Bell数
+    - 1.16.5 伯努利数
+  - 1.17 定理相关
+    - 1.17.1 Cayley公式
+    - 1.17.2 Jacobi's Four Square Theorem
+    - 1.17.3 Matrix-Tree定理
+    - 1.17.4 平面图欧拉公式
+    - 1.17.5 蔡勒公式
+    - 1.17.6 皮克定理
+    - 1.17.7 组合数LCM
+    - 1.17.8 错排公式
+    - 1.17.9 Prufer Sequence
+    - 1.17.10 二项式反演
+    - 1.17.11 $x^k$转化
+    - 1.17.12 BEST Theorem
+    - 1.17.13 拉格朗日四平方和定理
+    - 1.17.14 第$k$小期望
+    - 1.17.15 Stirling公式
+    - 1.17.16 泰勒展开
+    - 1.17.17 polya定理
+  - 1.18 博弈论
+ 	- 1.18.1 sg函数
+ 	- 1.18.2 Nim Game
+ 	- 1.18.3 Bash Game
+ 	- 1.18.4 Nim-k Game
+ 	- 1.18.5 Anti-Nim Game
+ 	- 1.18.6 Anti-SG Game
+ 	- 1.18.7 Staircase Nim
+ 	- 1.18.8 Lasker's Nim Game
+ 	- 1.18.9 Wythoff Game
+ 	- 1.18.10 树上删边游戏
+ 	- 1.18.11 无向图删边游戏
+ 	- 1.18.12 翻硬币游戏
+ 	- 1.18.13 $K$倍动态减法游戏
+
+# 1 mathematics
+### 1.1 素数相关
+##### 1.1.1 埃氏筛
+得到  $[L,R]$ 范围内的所有素数
+
+时间复杂度 $O(\sqrt{R}\log\log\sqrt{R}+(R-L)\log\log(R-L)$
+
+```
+//get_prime得到[L,R]中的所有素数
+//tot表示素数个数
+//p数组表示素数
+//数组大小max(sqrt(R),R-L)+1
+#define Maxn 1000007
+int cnt,prime[Maxn];
+bool vis[Maxn];
+int tot,p[Maxn];
+int L,R;
+void get_prime(int L,int R)
+{
+    cnt=0;
+    memset(prime,0,sizeof(prime));
+    memset(vis,true,sizeof(vis));
+    int mx=(int)sqrt(R)+1;
+    for (int i=2;i<=mx;i++)
+        if (vis[i])
+        {
+            prime[++cnt]=i;
+            for (int j=2;j<=mx/i;j++)
+                vis[i*j]=false;
+        }
+    tot=0;
+    memset(p,0,sizeof(p));
+    memset(vis,true,sizeof(vis));
+    if (L==1) vis[0]=false;
+    for (int i=1;i<=cnt;i++)
+    {
+        int val=(L-1)/prime[i];
+        ++val;
+        if (val<=1) val=2;
+        while (val<=R/prime[i])
+        {
+            vis[val*prime[i]-L]=false;
+            ++val;
+        }
+    }
+    for (int i=L;;i++)
+    {
+        if (vis[i-L]) p[++tot]=i;
+        if (i==R) break;
+    }
+}
+
+```
+##### 1.1.2 线性筛
+得到所有不超过$N$的素数
+
+时间复杂度 $O(N)$
+
+```
+//get_prime得到所有小于等于n的素数
+//cnt表示素数个数
+//prime[i]表示第i个素数的大小
+//vis[i]表示i是否为素数(true表示不是素数，false表示是素数)
+//数组大小n
+#define Maxn 40000
+int n;
+int prime[Maxn],cnt;
+bool vis[Maxn];
+void get_prime(int n)
+{
+    memset(prime,0,sizeof(prime));
+    cnt=0;
+    memset(vis,false,sizeof(vis));
+    vis[1]=true;
+    for (int i=2;i<=n;i++)
+    {
+        if (!vis[i]) prime[++cnt]=i;
+        for (int j=1;j<=cnt&&prime[j]<=n/i;j++)
+        {
+            vis[i*prime[j]]=true;
+            if (i%prime[j]==0) break;
+        }
+    }
+}
+
+```
+##### 1.1.3 pollard-rho
+将正整数$N$分解质因数
+
+时间复杂度 $O(\sqrt[4]{n})$
+
+```
+//make函数将n分解质因数
+//cnt表示素因子个数
+//pri数组表示素因子大小
+//tot数组表示每个素因子的个数
+//注意pri数组不保证排好序
+//数组大小为素因子个数(n<=1e18只需开到30)
+long long n;
+long long tot[37],pri[37],cnt;
+map<long long,int> mp;
+long long multiply(long long x,long long y,long long modp)
+{
+	return ((x*y-(long long)(((long double)x*y+0.5)/modp)*modp)%modp+modp)%modp;
+}
+long long power(long long a,long long b,long long modp)
+{
+	long long res=1,now=a%modp,left=b;
+	while (left>0)
+	{
+		if (left%2==1) res=multiply(res,now,modp);
+		left/=2;
+		now=multiply(now,now,modp);
+	}
+	return res;
+}
+long long get_rand()
+{
+	return (long long)rand()<<30|rand();
+}
+long long gcd(long long a,long long b)
+{
+	return b==0?a:gcd(b,a%b);
+}
+long long Polland_Rho(long long n,int c)
+{
+	long long x,y,cnt=1,k=2;
+	x=y=get_rand()%(n-1)+1;
+	while (true)
+	{
+		++cnt;
+		x=(multiply(x,x,n)+c)%n;
+		long long g=gcd(n,abs(x-y));
+		if (g>1&&g<n) return g;
+		if (x==y) return n;
+		if (cnt==k)
+		{
+			y=x;
+			k<<=1;
+		}
+	}
+}
+bool Miller_Robin(long long n)
+{
+	if (n==1) return false;
+	if (n==2) return true;
+	if (n%2==0) return false;
+	long long a=0,b=n-1;
+	while (b%2==0)
+	{
+		++a;
+		b/=2;
+	}
+	for (int t=1;t<=100;t++)
+	{
+		long long x=get_rand()%(n-1)+1,y=power(x,b,n);
+		for (long long i=0;i<a;i++)
+		{
+			x=multiply(y,y,n);
+			if (x==1&&y!=1&&y!=n-1) return false;
+			y=x;
+		}
+		if (y!=1) return false;
+	}
+	return true;
+}
+void make(long long n)
+{
+	if (n==1) return;
+	if (Miller_Robin(n))
+	{
+		if (mp[n]) ++tot[mp[n]];
+		else
+		{
+			tot[++cnt]=1;
+			mp[n]=cnt;
+			pri[cnt]=n;
+		}
+		return;
+	}
+	long long p=n;
+	while (p>=n) p=Polland_Rho(n,get_rand()%(n-1));
+	make(p);
+	make(n/p);
+}
+
+```
+
+### 1.2 gcd相关
+##### 1.2.1 ex_gcd
+求出满足$ax+by=gcd(a,b)$的一组整数解 $(x,y)$
+
+时间复杂度 $O(\log n)$
+```
+//ex_gcd求出ax+by=gcd(a,b)的一组整数解(x,y)
+//x,y可能为负数
+void ex_gcd(long long a,long long b,long long &x,long long &y)
+{
+    if (b==0LL)
+    {
+        x=1LL;
+        y=0LL;
+        return;
+    }
+    ex_gcd(b,a%b,x,y);
+    long long t=x;
+    x=y;
+    y=t-1LL*(a/b)*y;
+}
+```
+
+##### 1.2.2 类欧几里得
+求出：
+
+$f(a,b,c,n)=\sum_{i=0}^{n}[\frac{ai+b}{c}]$
+
+$g(a,b,c,n)=\sum_{i=0}^{n}i[\frac{ai+b}{c}]$
+
+$h(a,b,c,n)=\sum_{i=0}^{n}[\frac{ai+b}{c}]^2$
+
+当 $a \geq c$ 或 $b \geq c$时，
+
+$f(a,b,c,n)=f(a \% c,b \% c,c,n)+\frac{n(n+1)}{2}[\frac{a}{c}]+(n+1)[\frac{b}{c}]$
+
+$g(a,b,c,n)=g(a \% c,b \% c,c,n)+\frac{n(n+1)(2n+1)}{6}[\frac{a}{c}]+\frac{n(n+1)}{2}[\frac{b}{c}]$
+
+$h(a,b,c,n)=h(a \% c,b \% c,c,n)+\frac{n(n+1)(2n+1)}{6}[\frac{a}{c}]^2+(n+1)[\frac{b}{c}]^2+2[\frac{b}{c}]f(a \% c,b \% c,c,n)+2[\frac{a}{c}]g(a \% c,b \% c,c,n)+[\frac{a}{c}][\frac{b}{c}]n(n+1)$
+
+否则，当 $a=0$ 时，
+
+$f(a,b,c,n)=0$
+
+$g(a,b,c,n)=0$
+
+$h(a,b,c,n)=0$
+
+否则，
+
+$f(a,b,c,n)=n[\frac{an+b}{c}]-f(c,-b+c-1,a,[\frac{an+b}{c}]-1)$
+
+$g(a,b,c,n)=\frac{[\frac{an+b}{c}]n(n+1)-f(c,-b+c-1,a,[\frac{an+b}{c}]-1)-h(c,-b+c-1,a,[\frac{an+b}{c}]-1)}{2}$
+
+$h(a,b,c,n)=[\frac{an+b}{c}]([\frac{an+b}{c}]+1)n-2g(c,-b+c-1,a,[\frac{an+b}{c}]-1)-2f(c,-b+c-1,a,[\frac{an+b}{c}]-1)-f(a,b,c,n)$
+
+时间复杂度 $O(\log N)$
+```
+long long f(long long a,long long b,long long c,long long n)
+{
+    if (a>=c||b>=c) return f(a%c,b%c,c,n)+1LL*(a/c)*((1LL*n*(n+1))/2)+1LL*(n+1)*(b/c);
+    else if (a==0LL) return 0LL;
+    else return 1LL*n*((1LL*a*n+b)/c)-f(c,-b+c-1,a,(1LL*a*n+b)/c-1);
+}
+
+```
+
+### 1.3 函数相关
+##### 1.3.1 欧拉函数
+定义$\phi(n)$为$1...n$中与$n$互质的数的个数
+
+##### (1) 设 $n=p_1^{q_1} \cdot p_2^{q_2}...p_k^{q_k}$ ，我们可得 $\phi(n)=n(1-\frac{1}{p_1})(1-\frac{1}{p_2})...(1-\frac{1}{p_k})$
+
+##### (2) $\phi(n)$ 为部分积性函数，即当 $gcd(n,m)=1$ 时，$\phi(nm)=\phi(n) \cdot \phi(m)$
+
+##### (3) 当$n\neq2$ 时， $\phi(n)$为偶数
+
+##### (4) $\sum_{d|n}\phi(n)=n$
+
+##### (5) 小于$n$且和$n$互素的所有数之和为 $\frac{\phi(n) \cdot n}{2}$
+
+通过线性筛得到$[1,N]$所有数的欧拉函数
+
+时间复杂度$O(N)$
+
+```
+//get_phi得到所有小于等于n的数的欧拉函数
+//cnt表示素数个数
+//prime[i]表示第i个素数的大小
+//vis[i]表示i是否为素数(true表示不是素数，false表示是素数)
+//phi[i]表示i的欧拉函数
+//数组大小n
+#define Maxn 50007
+int n;
+int prime[Maxn],phi[Maxn],cnt=0;
+bool vis[Maxn];
+void get_phi(int n)
+{
+    memset(prime,0,sizeof(prime));
+    memset(phi,0,sizeof(phi));
+    phi[1]=1;
+    cnt=0;
+    memset(vis,false,sizeof(vis));
+    vis[1]=true;
+    for (int i=2;i<=n;i++)
+    {
+        if (!vis[i]) 
+        {
+            prime[++cnt]=i;
+            phi[i]=i-1;
+        }
+        for (int j=1;j<=cnt&&prime[j]<=n/i;j++)
+        {
+            vis[i*prime[j]]=true;
+            if (i%prime[j]==0) 
+            {
+                phi[i*prime[j]]=phi[i]*prime[j];
+                break;
+            }
+            phi[i*prime[j]]=phi[i]*(prime[j]-1);
+        }
+    }
+}
+
+```
+
+##### 1.3.2 莫比乌斯函数
+莫比乌斯函数：
+
+当$n=1$时，$\mu(n)=1$
+
+当$n=p_1 \cdot p_2 \cdot p_3...p_m$时，$\mu(n)=(-1)^m$
+
+当$n$不满足以上两种情况时，$\mu(n)=0$
+
+莫比乌斯反演：
+
+当 $g(n)=\sum_{d|n} f(d)$ 时，反演可得 $f(n)=\sum_{d|n} \mu(d) \cdot g(\frac{n}{d})$
+
+由上可得以下性质：
+
+##### (1) $\sum_{d|x}\mu(d)= [x=1]$
+
+##### (2) $\mu(x)$为部分积性函数，即当 $gcd(n,m)=1$ 时，$\mu(nm)=\mu(n) \cdot \mu(m)$
+
+##### (3) $\sum_{d|n}\mu(d) \cdot \frac{n}{d}=\phi(n)$
+
+通过线性筛得到$[1,N]$所有数的莫比乌斯函数
+
+时间复杂度$O(N)$
+
+```
+//get_phi得到所有小于等于n的数的欧拉函数
+//cnt表示素数个数
+//prime[i]表示第i个素数的大小
+//vis[i]表示i是否为素数(true表示不是素数，false表示是素数)
+//mu[i]表示i的莫比乌斯函数
+//数组大小n
+#define Maxn 200007
+int prime[Maxn],mu[Maxn],cnt=0;
+bool vis[Maxn];
+void get_mu(int n)
+{
+    cnt=0;
+    memset(prime,0,sizeof(prime));
+    memset(mu,0,sizeof(mu));
+    memset(vis,false,sizeof(vis));
+    mu[1]=1;
+    vis[1]=true;
+    for (int i=2;i<=n;i++)
+    {
+        if (!vis[i])
+        {
+            prime[++cnt]=i;
+            mu[i]=-1;
+        }
+        for (int j=1;j<=cnt&&prime[j]<=n/i;j++)
+        {
+            vis[i*prime[j]]=true;
+            if (i%prime[j]==0)
+            {
+                mu[i*prime[j]]=0;
+                break;
+            }
+            mu[i*prime[j]]=-mu[i];
+        }
+    }
+}
+
+```
+
+### 1.4 筛法
+##### 1.4.1 杜教筛
+对于积性函数 $f(i)$，构造积性函数 $g(x)$和 $h(x)$ 使得 $h(x)=\sum_{d|x}f(d)g(\frac{x}{d})$
+
+定义 $S(n)=\sum_{i=1}^{n}f(i)$
+
+则有 $g(1)S(n)=\sum_{i=1}^{n}h(i)-\sum_{d=2}^{n}g(d)S([\frac{n}{d}])$
+
+$S1(n)=\sum_{i=1}^{n}\mu(i)=1-\sum_{d=2}^{n}S1([\frac{n}{d}])$
+
+$S2(n)=\sum_{i=1}^{n}\phi(i)=\sum_{i=1}^{n}i-\sum_{d=2}^{n}S2([\frac{n}{d}])$
+
+$S3(n)=\sum_{i=1}^{n}i\cdot\phi(i)=\sum_{i=1}^{n}i^2-\sum_{d=2}^{n}d \cdot S3([\frac{n}{d}])$
+
+时间复杂度 $O(n^{\frac{2}{3}})$
+```
+//calc()计算i*phi(i)的前缀和
+//B表示n^(2/3)
+//先用线性筛算出B以内的答案，大于B的使用杜教筛
+//一定要用map预存已经计算过的部分
+//inv2和inv6分别表示2和6的乘法逆元
+#define modp 1000000007
+#define B 1000000
+using namespace std;
+int s[B+7];
+int inv2,inv6;
+unordered_map<int,int> mp;
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+int calc1(int n)
+{
+    int res=(1LL*n*(n+1))%modp;
+    res=(1LL*res*inv2)%modp;
+    return res;
+}
+int calc2(int n)
+{
+    int res=(1LL*n*(n+1))%modp;
+    int tmp=(2LL*n+1)%modp;
+    res=(1LL*res*tmp)%modp;
+    res=(1LL*res*inv6)%modp;
+    return res;
+}
+int calc(int n)
+{
+    if (n<=B) return s[n];
+    if (mp.find(n)!=mp.end()) return mp[n];
+    int res=calc2(n);
+    for (int now=2;now<=n;)
+    {
+        int tmp=n/(n/now);
+        int del=(1LL*calc(n/now)*((calc1(tmp)-calc1(now-1)+modp)%modp))%modp;
+        res=(res+modp-del)%modp;
+        now=tmp+1;
+    }
+    mp[n]=res;
+    return res;
+}
+bool vis[B+7];
+int prime[B+7],phi[B+7],cnt=0;
+void pre()
+{
+    phi[1]=1;
+    for (int i=2;i<=B;i++)
+    {
+        if (!vis[i])
+        {
+            prime[++cnt]=i;
+            phi[i]=i-1;
+        }
+        for (int j=1;j<=cnt;j++)
+        {
+            if (1LL*i*prime[j]>B) break;
+            vis[1LL*i*prime[j]]=true;
+            if (i%prime[j]==0)
+            {
+                phi[1LL*i*prime[j]]=phi[i]*prime[j];
+                break;
+            } else phi[1LL*i*prime[j]]=phi[i]*(prime[j]-1);
+        }
+    }
+    for (int i=1;i<=B;i++)
+        s[i]=(s[i-1]+1LL*i*phi[i])%modp;
+    mp.clear();
+    inv2=power(2,modp-2);
+    inv6=power(6,modp-2);
+}
+
+```
+
+##### 1.4.2 min_25筛
+设$f(n)$是一个积性函数，且$f(p)$是关于$p$的简单多项式，$f(p^c)$能快速计算
+
+第一部分：对于 $x=[\frac{n}{i}]$计算 $\sum_{i=2}^x[i \in prime]f(i)$
+
+第一部分我们假设$f(n)$完全积性（有的时候可以拆成若干个完全积性函数）
+
+线性筛得到$\sqrt{n}$范围内的素数，设$P_j$为从小到大第$j$个
+
+设 $g(n,j)=\sum_{i=1}^n[i \in P 或 min_{prime}(i)>P_j]f(i)$
+
+$g(n,0)=\sum_{i=2}^nf(i)$
+
+当 $P_j^2 \leq n$时，$g(n,j)=g(n,j-1)-f(P_j)[g(\frac{n}{P_j},j-1)-\sum_{i=1}^{j-1}f(P_i)]$
+
+当 $P_j^2 \geq n$时，$g(n,j)=g(n,j-1)$
+
+第二部分：计算$\sum_{i=1}^nf(i)$
+
+设 $S(n,j)=\sum_{i=2}^n[min_{prime}(i)>=P_j]f(i)$
+
+$S(n,j)=g(n,|P|)-\sum_{i=1}^{j-1}f(P_i)+\sum_{k=j}^{P_k^2 \leq n}\sum_{e=1}^{P_k^{e+1} \leq n}(S(\frac{n}{P_k^e},k+1)*f(P_k^e)+f(P_k^{e+1}))$
+
+$\sum_{i=1}^nf(i)=S(n,1)+f(1)$
+
+时间复杂度 $O(\frac{n^{\frac{3}{4}}}{\log{n}})$
+
+注意两部分的$f$函数意义不同！！！
+
+```
+//solve()计算前缀和
+//f(1)=1
+//f(p^c)=p xor c
+//f(ab)=f(a)f(b) (gcd(a,b)==1)
+//数组大小2*sqrt(n)+1
+using namespace std;
+#define modp 1000000007
+bool vis[200007];
+int prime[200007],cnt=0;
+long long sum[200007];
+long long val[200007];
+long long g1[200007],g2[200007];
+unordered_map<long long,int> mp;
+int tot=0;
+void get_prime(int n)
+{
+    memset(vis,false,sizeof(vis));
+    vis[1]=true;
+    for (int i=2;i<=n;i++)
+        if (!vis[i])
+        {
+            prime[++cnt]=i;
+            sum[cnt]=(sum[cnt-1]+i)%modp;
+            for (int j=2;j<=n/i;j++)
+                vis[i*j]=true;
+        }
+}
+void get_g()
+{
+    mp.clear();
+    long long now=1;
+    while (now<=n)
+    {
+        val[++tot]=n/now;
+        mp[n/now]=tot;
+        now=n/(n/now)+1;
+    }
+    for (int i=1;i<=tot;i++)
+    {
+        g1[i]=(1LL*(val[i]%modp)*((val[i]+1)%modp))%modp;
+        if (g1[i]%2==1) g1[i]+=modp;
+        g1[i]/=2;
+        g1[i]=(g1[i]+modp-1)%modp;
+        g2[i]=(val[i]+modp-1)%modp;
+    }
+    for (int j=1;j<=cnt;j++)
+        for (int i=1;i<=tot&&1LL*prime[j]*prime[j]<=val[i];i++)
+        {
+            int pos=mp[val[i]/prime[j]];
+            g1[i]=(g1[i]-(1LL*prime[j]*(g1[pos]-sum[j-1]+modp)%modp)+modp)%modp;
+            g2[i]=(g2[i]-g2[pos]+j-1)%modp;
+        }
+}
+long long s(long long n,int j)
+{
+    long long res=0LL;
+    if (n<=1LL||prime[j]>n) return res;
+    int pos=mp[n];
+    res=(g1[pos]-g2[pos]+modp)%modp;
+    res=(res-sum[j-1]+j-1+modp)%modp;
+    for (int k=j;k<=cnt&&1LL*prime[k]*prime[k]<=n;k++)
+    {
+        long long now=1LL*prime[k];
+        for (int e=1;1LL*prime[k]*now<=n;e++,now=1LL*now*prime[k])
+        {
+            res=(res+1LL*s(n/now,k+1)*(prime[k]^e))%modp;
+            res=(res+(prime[k]^(e+1)))%modp;
+        }
+    }
+    if (j==1) res=(res+2)%modp;
+    return res;
+}
+long long solve(long long n)
+{
+    get_prime((int)sqrt(n)+1);
+    get_g();
+    return (s(n,1)+1)%modp;
+}
+
+```
+
+### 1.5 同余
+##### 1.5.1 高斯消元
+时间复杂度 $O(n^3)$
+
+矩阵行列式：通过高斯消元使得主对角线以下位置都是0，然后主对角线的乘积就是行列式的绝对值
+
+矩阵的逆：将原矩阵和单位矩阵一起进行高斯消元使得只有主对角线不为0，当原矩阵变成单位矩阵，原单位矩阵就会变成矩阵的逆
+
+解方程：
+```
+//n个方程，n个变量，第n+1个为等式右侧的常数项
+//对于第i个变量，a[now][n+1]为它的值
+//不存在now的表示它为任意值
+//true表示有解，false表示无解
+int n;
+double f[Maxn],a[Maxn][Maxn];
+bool gauss()
+{
+    int now=1,x;
+    double t;
+    for (int i=1;i<=n;i++)
+    {
+        for (x=now;x<=n;x++)
+            if (fabs(a[x][i])>eps) break;
+        if (x>n) continue;
+        if (x!=now)
+        {
+            for (int j=1;j<=n+1;j++)
+                swap(a[now][j],a[x][j]);
+        }
+        t=a[now][i];
+        for (int j=1;j<=n+1;j++)
+            a[now][j]/=t;
+        for (int j=1;j<=n;j++)
+            if (j!=now)
+            {
+                t=a[j][i];
+                for (int k=1;k<=n+1;k++)
+                    a[j][k]-=t*a[now][k];
+            }
+        ++now;
+    }
+    for (int i=now;i<=n;i++)
+        if (fabs(a[i][n+1])>eps) return false;
+    return true;
+}
+```
+求矩阵的行列式：
+```
+//求矩阵的行列式
+#define Maxn 107
+int n,modp;
+int a[Maxn][Maxn];
+int det()
+{
+    int res=1;
+    for (int i=1;i<=n;i++)
+    {
+        for (int j=i+1;j<=n;j++)
+        {
+            while (a[j][i])
+            {
+                int tmp=a[i][i]/a[j][i];
+                for (int k=i;k<=n;k++)
+                {
+                    a[i][k]=(a[i][k]+modp-(1LL*tmp*a[j][k])%modp)%modp;
+                    swap(a[i][k],a[j][k]);
+                }
+                res=(modp-res)%modp;
+            }
+        }
+        res=(1LL*res*a[i][i])%modp;
+    }
+    return res;
+}
+
+```
+
+##### 1.5.2 BSGS
+求最小的$x$使得 $A^x \equiv B(mod p)$
+
+其中$p$是一个素数
+
+时间复杂度 $O(\sqrt{p})$
+```
+//用了set做判断卡常数
+//solve()计算最小的x使得A^x=B (mod p)
+unordered_map<int,int> mp;
+set<int> s;
+int power(int a,int b,int modp)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+void solve(int A,int B,int p)
+{
+    mp.clear();
+    s.clear();
+    int T=(int)ceil(sqrt(p+0.5));
+    int now=1;
+    for (int i=0;i<T;i++)
+    {
+        if (mp.find(now)==mp.end()) mp[now]=i,s.insert(now);
+        now=(1LL*now*A)%p;
+    }
+    int inv=power(now,p-2,p);
+    int res=B;
+    for (int i=0;i<T;i++)
+    {
+        if (s.find(res)!=s.end())
+        {
+            printf("%d\n",i*T+mp[res]);
+            return;
+        }
+        res=(1LL*res*inv)%p;
+    }
+    printf("no solution\n");
+}
+
+```
+##### 1.5.3 ex_BSGS
+求最小的$x$使得 $A^x \equiv B(mod C)$
+
+其中$C$不一定是素数
+
+先特判 $x=0$ 的情况
+
+设 $d=gcd(A,C)$，则 $B$是$d$的倍数且$A^{x-1}*\frac{A}{d} \equiv \frac{B}{d}(mod \frac{C}{d})$
+
+直到$gcd(A,C)=1$为止，则 $A^{x-k}*\frac{A^k}{\pi_{i=1}^kd_i}\equiv \frac{B}{\pi_{i=1}^kd_i}(mod \frac{C}{\pi_{i=1}^kd_i})$
+
+枚举 $x=1,2,...,k-1$ 的情况，$x>=k$的情况用BSGS完成（求逆元一定要用ex_gcd完成）
+
+时间复杂度 $O(\sqrt{n})$
+```
+//solve()计算最小的x使得A^x=B (mod C)
+unordered_map<int,int> mp;
+void ex_gcd(int a,int b,int &x,int &y)
+{
+    if (b==0)
+    {
+        x=1;
+        y=0;
+        return;
+    }
+    ex_gcd(b,a%b,x,y);
+    int t=x;
+    x=y;
+    y=t-(a/b)*y;
+}
+int inv(int a,int p)
+{
+    int x,y;
+    ex_gcd(a,p,x,y);
+    x=(x%p+p)%p;
+    return x;
+}
+void solve(int A,int B,int C)
+{
+    A%=C;
+    if (B==1)
+    {
+        printf("%d\n",0);
+        return;
+    }
+    int k=0,tmp=1;
+    int a=A,b=B,c=C;
+    int d=__gcd(A,c);
+    int now=A;
+    while (d!=1)
+    {
+        if (b%d!=0) 
+        {
+            printf("no solution\n");
+            return;
+        }
+        b/=d;
+        c/=d;
+        tmp=(1LL*tmp*(A/d))%c;
+        ++k;
+        if (now==B)
+        {
+            printf("%d\n",k);
+            return;
+        }
+        now=(1LL*now*A)%C;
+        d=__gcd(A,c);
+    }
+    tmp=inv(tmp,c);
+    b=(1LL*b*tmp)%c;
+    a=A;
+    int T=(int)ceil(sqrt(C+0.5))+1;
+    mp.clear();
+    now=1;
+    for (int i=0;i<T;i++)
+    {
+        if (mp.find(now)==mp.end()) mp[now]=i;
+        now=(1LL*now*a)%c;
+    }
+    now=inv(now,c);
+    for (int i=0;i<=T;i++)
+    {
+        if (mp.find(b)!=mp.end())
+        {
+            printf("%d\n",k+i*T+mp[b]);
+            return;
+        }
+        b=(1LL*b*now)%c;
+    }
+    printf("no solution\n");
+}
+
+```
+##### 1.5.4 原根
+阶：
+
+设 $m \geq 1$ 且 $gcd(a,m)=1$，则使得 $a^t \equiv 1 (mod m)$成立的最小正整数 $t$ 称为 $a$ 对模 $m$ 的阶，记作$\delta_m(a)$. 
+
+性质1:设 $m \geq 1$ 且 $gcd(a,m)=1$，若$a^n \equiv 1 (mod m)$且 $n > 0$，则$\delta_(a)|n$
+
+性质2:$\delta_m(a)|\phi(m)$
+
+推论1:若$p$和$q$都是奇素数，且$q|(a^p-1)$，则有$q|(a-1)$或$2p|(q-1)$
+
+推论2:$2^p-1$的任何因子都是$2kp+1$的形式
+
+原根：
+
+若$\delta_m(a)=\phi(m)$，则$a$是$m$的一个原根
+
+定理1:若$g$是$m$的一个原根，则$g,g^2,...,g^{\phi(m)}$恰好是小于$m$且与$m$互素的数的排列
+
+定理2:若$m$有原根，则原根个数为$\phi(\phi(m))$
+
+定理3:一个数有原根当且仅当$m=2,4,p^e,2p^e$，其中$p$是奇素数
+
+推论1:若$d|(p-1)$，则 $x^d\equiv 1 (mod p)$恰有$d$个解
+
+推论2:若$p$为素数,$d|(p−1)$,则阶为$d$的最小剩余$(mod p)$的个数为$\phi(d)$
+
+拉格朗日定理：假设 $f(n)=a_nx^n+...+a_1x+a_0$是一个次数为$n$,首项系数$a_n$不能被$p$整除的整系数多项式，且$n\geq1$，那么$f(x)$至多有$n$个模$p$不同余的根
+
+性质1:一个数的最小原根的大小是$O(n^{\frac{1}{4}})$的
+
+性质2:如果$g$为$n$的原根，则$g^d$为$n$的原根的充要条件是$(d,\phi(n))=1$
+
+时间复杂度$O(n\log{n})$（？）
+
+```
+//flag[]表示是否有原根
+//get_g()求出一个原根
+//solve()求出所有的原根
+//get_frac()求出所有的素因子
+#define Maxn 1000007
+int que[Maxn],tmp=0;
+int ans[Maxn],tot=0;
+int prime[Maxn],phi[Maxn],cnt=0;
+bool vis[Maxn],flag[Maxn];
+void get_phi(int n)
+{
+    memset(prime,0,sizeof(prime));
+    memset(phi,0,sizeof(phi));
+    phi[1]=1;
+    cnt=0;
+    memset(vis,false,sizeof(vis));
+    vis[1]=true;
+    for (int i=2;i<=n;i++)
+    {
+        if (!vis[i]) 
+        {
+            prime[++cnt]=i;
+            phi[i]=i-1;
+        }
+        for (int j=1;j<=cnt&&prime[j]<=n/i;j++)
+        {
+            vis[i*prime[j]]=true;
+            if (i%prime[j]==0) 
+            {
+                phi[i*prime[j]]=phi[i]*prime[j];
+                break;
+            }
+            phi[i*prime[j]]=phi[i]*(prime[j]-1);
+        }
+    }
+}
+void get_flag(int n)
+{
+    memset(flag,false,sizeof(flag));
+    flag[2]=true;
+    flag[4]=true;
+    for (int i=2;i<=cnt;i++)
+    {
+        int now=prime[i];
+        flag[now]=true;
+        if (2*now<=n) flag[2*now]=true;
+        while (now<=n/prime[i])
+        {
+            now*=prime[i];
+            flag[now]=true;
+            if (2*now<=n) flag[2*now]=true;
+        }
+    }
+}
+void get_frac(int n)
+{
+    tmp=0;
+    for (int i=1;i<=cnt&&prime[i]*prime[i]<=n;i++)
+        if (n%prime[i]==0)
+        {
+            que[++tmp]=prime[i];
+            while (n%prime[i]==0) n/=prime[i];
+        }
+    if (n!=1) que[++tmp]=n;
+}
+int power(int a,int b,int modp)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+int get_g()
+{
+    get_frac(phi[n]);
+    for (int i=2;;i++)
+    {
+        if (power(i,phi[n],n)!=1) continue;
+        int j=1;
+        for (;j<=tmp;j++)
+            if (power(i,phi[n]/que[j],n)==1) break;
+        if (j>tmp) return i;
+    }
+}
+void get_all()
+{
+    tot=1;
+    ans[1]=get_g();
+    int now=(1LL*ans[1]*ans[1])%n;
+    for (int i=2;i<phi[n];i++,now=(1LL*now*ans[1])%n)
+        if (__gcd(i,phi[n])==1) ans[++tot]=now;
+    sort(ans+1,ans+tot+1);
+    for (int i=1;i<tot;i++)
+        printf("%d ",ans[i]);
+    printf("%d\n",ans[tot]);
+}
+void solve(int n)
+{
+    get_phi(1000000);
+    get_flag(1000000);
+    if (n<=3)
+    {
+        printf("%d\n",n-1);
+        return;
+    }
+    if (!flag[n])
+    {
+        printf("%d\n",-1);
+        return;
+    }
+    get_all();
+}
+
+```
+
+##### 1.5.5 中国剩余定理
+时间复杂度 $O(n\log{n})$
+```
+//flag表示是否有解
+//Ans % a[i] = b[i]
+//Ans = k*A + B
+#define Maxn 100007
+int n;
+long long A,B;
+long long a[Maxn],b[Maxn];
+bool flag;
+long long ex_gcd(long long a,long long b,long long &x,long long &y)
+{
+    if (b==0LL)
+    {
+        x=1LL;
+        y=0LL;
+        return a;
+    }
+    long long res=ex_gcd(b,a%b,x,y);
+    long long t=x;
+    x=y;
+    y=t-1LL*(a/b)*y;
+    return res;
+}
+void solve()
+{
+    A=1LL,B=0LL;
+    flag=true;
+    for (int i=1;i<=n;i++)
+    {
+        long long x,y;
+        long long d=ex_gcd(A,a[i],x,y);
+        if ((b[i]-B)%d)
+        {
+            flag=false;
+            return;
+        }
+        x=(1LL*x*((b[i]-B)/d)+a[i]/d)%(a[i]/d);
+        y=1LL*(A/d)*a[i];
+        B=((1LL*x*A+B)%y+y)%y;
+        A=y;
+    }
+}
+
+```
+
+##### 1.5.6 二次剩余
+
+求解 $x^2 \equiv N (\mod P)$
+
+其中 $P$为质数
+
+```
+//solve()求解
+//无解返回-1
+//有解返回r，表示答案为r或p-r
+long long multiply_mod(long long x,long long y,long long p)
+{
+	return ((x*y-(long long)(((long double)x*y+0.5)/p)*p)%p+p)%p;
+}
+long long power_mod(long long a,long long b,long long p)
+{
+    long long res=1LL,now=a,left=b;
+    while (left>0)
+    {
+        if (left&1) res=multiply_mod(res,now,p);
+        left/=2;
+        now=multiply_mod(now,now,p);
+    }
+    return res;
+}
+long long ToneLLi_Shanks(long long n,long long p)
+{
+    if (n==0) return 0LL;
+    if (p==2LL) return (n&1)?1:-1;
+    if (power_mod(n,p>>1,p)!=1) return -1;
+    if (p&2) return power_mod(n,(p+1)>>2,p);
+    int s=__builtin_ctzll(p^1);
+    long long q=p>>s,z=2LL;
+    for (;power_mod(z,p>>1,p)==1;++z);
+    long long c=power_mod(z,q,p);
+    long long r=power_mod(n,(q+1)>>1,p);
+    long long t=power_mod(n,q,p),tmp;
+    for (int m=s,i;t!=1;)
+    {
+        for (i=0,tmp=t;tmp!=1;++i)
+            tmp=multiply_mod(tmp,tmp,p);
+        for (;i<--m;)
+            c=multiply_mod(c,c,p);
+        r=multiply_mod(r,c,p);
+        c=multiply_mod(c,c,p);
+        t=multiply_mod(t,c,p);
+    }
+    return r;
+}
+
+```
+
+### 1.6 组合数
+计算 $C(n,m) mod p$，其中 $p$是一个素数
+
+时间复杂度 $O(p+\log{n})$
+```
+//solve(n,m,p)返回C(n,m) mod p
+#define Maxn 100007
+int pre[Maxn],inv[Maxn];
+int power(int a,int b,int modp)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+int calc(int n,int m,int modp)
+{
+    if (m>n) return 0;
+    int res=(1LL*inv[m]*inv[n-m])%modp;
+    return (1LL*res*pre[n])%modp;
+}
+int C(long long n,long long m,int modp)
+{
+    if (n<m) return 0;
+    if (m==0LL||n==m) return 1;
+    return (1LL*calc(n%modp,m%modp,modp)*C(n/modp,m/modp,modp))%modp;
+}
+int solve(long long n,long long m,int modp)
+{
+    pre[0]=1;
+    for (int i=1;i<modp;i++)
+        pre[i]=(1LL*pre[i-1]*i)%modp;
+    inv[modp-1]=power(pre[modp-1],modp-2,modp);
+    for (int i=modp-1;i;i--)
+        inv[i-1]=(1LL*inv[i]*i)%modp;
+    return C(n,m,modp);
+}
+
+```
+
+### 1.7 单纯形
+有 $m$ 个实数变量和 $n$个约束条件
+
+$x_j \geq 0$
+
+$\sum_{j=1}^ma_{ij}x_j \leq b_i$
+
+要使得 $z=\sum_{j=1}^mc_jx_j$ 最大
+
+判断是否有解并给出一组合法解
+
+uoj 97pts代码：
+```
+//op==1表示需要输出一组合法解
+//n个变量
+//m个约束条件
+//sum {i=1,2,...,n} a[i][j] * x[j] <= a[i][n+1]
+//最大化 z = sum {i=1,2,...,n} a[m+1][i] * x[i]
+#include <bits/stdc++.h>
+#define Maxn 107
+#define inf 1e9
+#define eps 1e-9
+using namespace std;
+double a[Maxn][Maxn];
+int id[Maxn*2],pos[Maxn];
+int n,m,op;
+int sgn(double x)
+{
+    if (fabs(x)<eps) return 0;
+    else if (x<0) return -1;
+    else return 1;
+}
+void pivot(int x,int y)
+{
+    swap(id[x],id[y+n]);
+    double t=a[y][x];
+    a[y][x]=-1.0;
+    for (int i=1;i<=n+1;i++)
+        a[y][i]/=-t;
+    for (int i=1;i<=m+1;i++)
+        if (i!=y)
+        {
+            double t=a[i][x];
+            if (sgn(t)==0) continue;
+            a[i][x]=0.0;
+            for (int j=1;j<=n+1;j++)
+                a[i][j]+=t*a[y][j];
+        }
+}
+double simplex()
+{
+    while (true)
+    {
+        int x=0;
+        for (int i=1;i<=n;i++)
+            if (sgn(a[m+1][i])>0)
+            {
+                x=i;
+                break;
+            }
+        if (x==0) return a[m+1][n+1];
+        int y=0;
+        double mn=inf;
+        for (int i=1;i<=m;i++)
+        {
+            if (sgn(a[i][x])>=0) continue;
+            double t=a[i][n+1]/-a[i][x];
+            if (t<mn)
+            {
+                mn=t;
+                y=i;
+            }
+        }
+        if (y==0) return inf;
+        pivot(x,y);
+    }
+}
+bool init()
+{
+    while (true)
+    {
+        int x=0,y=0;
+        for (int i=1;i<=m;i++)
+            if (sgn(a[i][n+1])<0&&(!x||rand()&1)) x=i;
+        if (!x) return 1;
+        for (int i=1;i<=n;i++)
+            if (sgn(a[x][i])>0&&(!y||rand()&1)) y=i;
+        if (!y) return 0;
+        pivot(y,x);
+    }
+}
+int main()
+{
+    scanf("%d%d%d",&n,&m,&op);
+    for (int i=1;i<=n;i++)
+        scanf("%lf",&a[m+1][i]);
+    for (int i=1;i<=m;i++)
+    {
+        for (int j=1;j<=n;j++)
+        {
+            scanf("%lf",&a[i][j]);
+            a[i][j]=-a[i][j];
+        }
+        scanf("%lf",&a[i][n+1]);
+    }
+    for (int i=1;i<=n+m;i++)
+        id[i]=i;
+    if (!init()) printf("Infeasible\n");
+    else
+    {
+        double ans=simplex();
+        if (sgn(ans-inf)==0) printf("Unbounded\n");
+        else
+        {
+            printf("%.8lf\n",ans);
+            if (op==1)
+            {
+                for (int i=1;i<=n+m;i++)
+                    pos[id[i]]=i;
+                for (int i=1;i<=n;i++)
+                    if (pos[i]<=n) printf("%.8lf ",0.0); else printf("%.8lf ",a[pos[i]-n][n+1]);
+                printf("\n");
+            }
+        }
+    }
+    return 0;
+}
+
+```
+
+uoj std:
+```
+#include<bits/stdc++.h>
+using namespace std;
+
+template <typename T> void chmin(T&x,const T &y)
+{
+	if(x>y)x=y;
+}
+template <typename T> void chmax(T &x,const T &y)
+{
+	if(x<y)x=y;
+}
+typedef long long s64;
+#define rep(i,l,r) for(int i=l;i<=r;++i)
+#define per(i,r,l) for(int i=r;i>=l;--i)
+#define gc (c=getchar())
+int read()
+{
+	char c;
+	while(gc<'-');
+	if(c=='-')
+	{
+		int x=gc-'0';
+		while(gc>='0')x=x*10+c-'0';
+		return -x;
+	}
+	int x=c-'0';
+	while(gc>='0')x=x*10+c-'0';
+	return x;
+}
+#undef gc
+
+const int W=1e8,B=40,T=120;
+struct db
+{
+	int a[T],n;
+	bool is_neg;
+	int& operator [](int x)
+	{
+		return a[x];
+	}
+	int operator [](int x)const
+	{
+		return a[x];
+	}
+	void left_move(int l)
+	{
+		per(i,n-1,0)a[i+l]=a[i];
+		rep(i,0,l-1)a[i]=0;
+		n+=l;
+	}
+	db (int x=0)
+	{
+		memset(a,0,sizeof(a));n=B;
+		is_neg=0;
+		if(x<0){is_neg=1;x=-x;}
+		while(x){a[n++]=x%W;x/=W;}
+	}
+	void print(char c='\n')const
+	{
+		if(is_neg)putchar('-');
+		if(n>B)
+		{
+			printf("%d",a[n-1]);
+			per(i,n-2,B)printf("%.8d",a[i]);
+		}
+		else printf("0");
+	
+		printf(".");
+		per(i,B-1,B-2)printf("%.8d",a[i]);
+		printf("%c",c);
+	}
+	long double evalu(int l)const
+	{
+		long double x=0;
+		per(i,n-1,l)x=x*W+a[i];
+		return x;
+	}
+};
+bool operator <(const db &a,const db &b)
+{
+	if(a.is_neg)
+	{
+		if(!b.is_neg)return 1;
+		per(i,T-1,0)
+		if(a[i]!=b[i])return a[i]>b[i];
+		return 0;
+	}
+	else
+	{
+		if(b.is_neg)return 0;
+		per(i,T-1,0)
+		if(a[i]!=b[i])return a[i]<b[i];
+		return 0;
+	}
+}
+bool operator >=(const db &a,const db &b)
+{
+	return !(a<b);
+}
+bool operator <=(const db &a,const db &b)
+{
+	return b>=a;
+}
+bool operator >(const db &a,const db &b)
+{
+	return b<a;
+}
+bool operator !(const db &a)
+{
+	int n=a.n;
+	while(n&&!a[n-1])--n;
+	return !n;
+}
+db operator -(db a)
+{
+	a.is_neg^=1;
+	return a;
+}
+db operator +(db a,const db &b);
+db operator -(db a,db b)
+{
+	b=-b;
+	if(a.is_neg)
+	{
+		if(!b.is_neg)
+		{
+			a=-a;
+			swap(a,b);
+		}
+		else return a+b;
+	}
+	else
+	{
+		if(b.is_neg)
+		{
+			b=-b;
+		}
+		else return a+b;
+	}
+	if(a<b)return -(b-a);
+	
+	rep(i,0,a.n-1)
+	if((a[i]-=b[i])<0)
+	{
+		a[i]+=W;
+		--a[i+1];
+	}
+	while(a.n&&!a[a.n-1])--a.n;
+	return a;
+}
+db operator +(db a,const db &b)
+{
+	if(a.is_neg)
+	{
+		if(!b.is_neg)return b-(-a);
+	}
+	else
+	{
+		if(b.is_neg)return a-(-b);
+	}
+	chmax(a.n,b.n);
+	rep(i,0,a.n-1)
+	if((a[i]+=b[i])>=W)
+	{
+		a[i]-=W;
+		++a[i+1];
+	}
+	if(a[a.n])++a.n;
+	return a;
+}
+void operator +=(db &a,const db &b)
+{
+	a=a+b;
+}
+void operator -=(db &a,const db &b)
+{
+	a=a-b;
+}
+db eps1,eps2,eps3;
+db operator *(const db &a,const db &b)
+{
+	db ans;
+	ans.is_neg=a.is_neg^b.is_neg;
+	ans.n=max(0,a.n+b.n-B);
+	rep(i,0,ans.n)
+	{
+		int jk=i+B;s64 sum=0;
+		rep(j,max(0,jk-(b.n-1)),min(jk,a.n-1))sum+=(s64)a[j]*b[jk-j];
+		int x=i;
+		while(sum)
+		{
+			ans[x]+=sum%W;
+			sum/=W;
+			++x;
+		}
+	}
+	rep(i,0,ans.n)
+	while(ans[i]>=W)
+	{
+		ans[i]-=W;
+		++ans[i+1];
+	}
+	if(ans.n&&!ans[ans.n-1])--ans.n;
+	return ans;
+}
+void operator *=(db &a,const db &b)
+{
+	a=a*b;
+}
+db operator *(db a,int k)
+{
+	per(i,a.n-1,0)
+	{
+		s64 sum=(s64)a[i]*k;
+		a[i]=sum%W;
+		a[i+1]+=sum/W;
+	}
+	rep(i,0,a.n-1)
+	while(a[i]>=W)
+	{
+		a[i]-=W;
+		++a[i+1];
+	}
+	if(a[a.n])++a.n;
+	return a;
+}
+db operator *(int k,const db &a)
+{
+	return a*k;
+}
+db operator /(db a,db b)
+{
+	a.is_neg^=b.is_neg;
+	b.is_neg=0;
+	a.left_move(B);
+	int l=max(0,b.n-20);
+	long double b_e=b.evalu(l);
+	db x;x.n=0;
+	per(i,a.n-1,0)
+	{
+		x.left_move(1);x[0]=a[i];
+		if(x>=b)
+		{
+			int k=x.evalu(l)/b_e;
+			if(k)--k;
+			a[i]=k;
+			x-=k*b;
+			while(x>=b)
+			{
+				x-=b;
+				++a[i];
+			}
+		}else a[i]=0;
+	}
+	while(a.n&&!a[a.n-1])--a.n;
+	return a;
+}
+void operator /=(db &a,const db &b)
+{
+	a=a/b;
+}
+int cmp(const db &x,const db &eps)
+{
+	return x<-eps?-1:x>eps;
+}
+const int N=20+1,M=20+1,inf=1e9;
+db a[M][N],b[M];
+int idn[N],idm[M];
+int n,m;
+void pivot(int x,int y)
+{
+	swap(idm[x],idn[y]);
+	db k=a[x][y];
+	rep(j,1,n)a[x][j]/=k;
+	b[x]/=k;
+	a[x][y]=1/k;
+	rep(i,0,m)
+	if(i!=x)
+	{
+		k=a[i][y];
+		b[i]-=k*b[x];
+		a[i][y]=0;
+		rep(j,1,n)a[i][j]-=a[x][j]*k;
+	}
+}
+void simplex()
+{
+	idn[0]=inf;
+	while(1)
+	{
+		int y=0;
+		rep(j,1,n)
+		if(cmp(a[0][j],eps1)>0&&idn[j]<idn[y])y=j;
+		if(!y)break;
+		int x=0;
+		rep(i,1,m)
+		if(cmp(a[i][y],eps1)>0)
+		{
+			if(!x)x=i;
+			else
+			{
+				int t=cmp(b[i]/a[i][y]-b[x]/a[x][y],eps2);
+				if(t<0||(t==0&&idm[i]<idm[x]))x=i;
+			}
+		}
+		if(!x)
+		{
+			puts("Unbounded");			
+			exit(0);
+		}
+		pivot(x,y);
+	}
+}
+void init()
+{
+	idm[0]=inf;idn[0]=inf;
+	while(1)
+	{
+		int x=0;
+		rep(i,1,m)
+		if(cmp(b[i],eps3)<0&&idm[i]<idm[x])x=i;
+		if(!x)break;
+		int y=0;
+		rep(j,1,n)
+		if(cmp(a[x][j],eps3)<0&&idn[j]<idn[y])y=j;
+		if(!y)
+		{
+			puts("Infeasible");
+			exit(0);
+		}
+		pivot(x,y);
+	}
+}
+
+int main()
+{	
+	int t;
+	n=read();m=read();t=read();
+	rep(j,1,n)a[0][j]=read();
+	rep(i,1,m)
+	{
+		rep(j,1,n)a[i][j]=read();
+		b[i]=read();
+	}
+	
+	eps1.n=B-20;eps1[eps1.n-1]=1;
+	eps2.n=B;eps2[eps2.n-1]=1;
+	eps3.n=B-20;eps3[eps3.n-1]=1;
+	
+	rep(j,1,n)idn[j]=j;
+	rep(i,1,m)idm[i]=n+i;
+	init();
+	simplex();
+	(-b[0]).print('\n');
+	if(t)
+	{
+		rep(j,1,n)
+		{
+			rep(i,1,m)
+			if(idm[i]==j)
+			{
+				b[i].print(' ');
+				goto Find ;
+			}
+			printf("0 ");
+			Find : ;
+		}
+		puts("");
+	}
+}
+```
+
+### 1.8 多项式
+##### 1.8.1 FFT
+时间复杂度 $O(n\log n)$
+
+```
+//FFT多项式乘法
+//n和m表示两个多项式次数
+//a[i],b[i]表示i次项
+//结果保存在a中
+#define MAXN 262144
+typedef struct 
+{
+    double real,imag;
+} com;
+com com_add(com a,com b)
+{
+    return(com){a.real+b.real,a.imag+b.imag};
+}
+com com_sub(com a,com b)
+{
+    return(com){a.real-b.real,a.imag-b.imag};
+}
+com com_mul(com a,com b)
+{
+    return(com)
+	{
+        a.real*b.real-a.imag*b.imag,
+        a.real*b.imag+a.imag*b.real
+    };
+}
+int n,m;
+com a[MAXN+7],b[MAXN+7];
+void fft(com *a, int n, int flag)
+{
+    for (int i=n/2,j=1;j<n;++j) 
+	{
+        if (i<j) swap(a[i],a[j]);
+        int k=n/2;
+        while (i&k) {i^=k;k/=2;}
+        i^=k;
+    }
+    for (int k=2;k<=n;k*=2) 
+	{
+        com root=(com){cos(M_PI/k*flag*2),sin(M_PI/k*flag*2)};
+        for (int i=0;i<n;i+=k) 
+		{
+            com w=(com){1.0, 0.0};
+            for (int j=i;j<i+k/2;++j) 
+			{
+                com u=a[j],v=com_mul(a[j+k/2],w);
+                a[j]=com_add(u,v);
+                a[j+k/2]=com_sub(u,v);
+                w=com_mul(w,root);
+            }
+        }
+    }
+    if (flag==-1)
+    {
+        for (int i=0;i<n;++i)
+            a[i].real=(int)trunc(a[i].real/n+0.5);
+    }
+}
+void multiply()
+{
+    ++n,++m;
+    int len=2;
+    while (len<m+n) len<<=1;
+    fft(a,len,1);fft(b,len,1);
+    for (int i=0;i<len;++i) a[i]=com_mul(a[i],b[i]);
+    fft(a,len,-1);
+}
+
+```
+
+##### 1.8.2 NTT
+时间复杂度 $O(n\log n)$
+
+```
+//NTT多项式乘法
+//n和m表示两个多项式次数
+//a[i],b[i]表示i次项
+//结果保存在a中
+#define Maxn 262144
+#define modp 998244353
+#define g 3
+int n,m,len;
+long long a[Maxn+7],b[Maxn+7];
+long long power(long long a,long long b)
+{
+	long long ans=1,now=a,left=b;
+	while (left>0)
+	{
+		if (left%2==1) ans=(1LL*ans*now)%modp;
+		left/=2;
+		now=(1LL*now*now)%modp;
+	}
+	return ans;
+}
+void ntt(long long *a, int n, int flag)
+{
+    for (int i=n/2,j=1;j<n;++j) 
+    {
+        if (i<j) swap(a[i],a[j]);
+        int k=n/2;
+        while (i&k) {i^=k;k/=2;}
+        i^=k;
+    }
+    for (int k=2;k<=n;k*=2) 
+    {
+		long long rt=power(g,(modp-1)/k);
+		if (flag==-1) rt=power(rt,modp-2);
+        for (int i=0;i<n;i+=k) 
+        {
+			long long del=1;
+            for (int j=i;j<i+k/2;++j) 
+            {
+                long long u=a[j],v=(1LL*a[j+k/2]*del)%modp;
+                a[j]=(u+v)%modp;
+                a[j+k/2]=(u+modp-v)%modp;
+				del=(1LL*del*rt)%modp;
+            }
+        }
+    }
+    if (flag==-1)
+    {
+        long long ni=power(n,modp-2);
+	    for (int i=0;i<n;i++) a[i]=(1LL*a[i]*ni)%modp;
+    }
+}
+void multiply()
+{
+    ++n,++m;
+    int len=2;
+	while (len<m+n) len<<=1;
+	ntt(a,len,1),ntt(b,len,1);
+	for (int i=0;i<len;i++) a[i]=(1LL*a[i]*b[i])%modp;
+	ntt(a,len,-1);
+}
+
+```
+
+##### 1.8.3 任意模数FFT
+时间复杂度 $O(n \log n)$
+```
+//输入数组为a[]和b[]
+typedef complex<double> Complex;
+#define modp 1000000007
+#define PI acos(-1.0)
+const int N=131072,L=16,MASK=(1<<L)-1;
+Complex w[N+7];
+void FFT_init()
+{
+    for (int i=0;i<N;i++)
+        w[i]=Complex(cos(2*i*PI/N),sin(2*i*PI/N));
+}
+void FFT(Complex p[],int n)
+{
+    for (int i=1,j=0;i<n-1;++i)
+    {
+        for (int s=n;j^=s>>=1,~j&s;);
+        if (i<j) swap(p[i],p[j]);
+    }
+    for (int d=0;(1<<d)<n;++d)
+    {
+        int m=1<<d,m2=m*2,rm=n>>(d+1);
+        for (int i=0;i<n;i+=m2)
+            for (int j=0;j<m;++j)
+            {
+                Complex &p1=p[i+j+m],&p2=p[i+j];
+                Complex t=w[rm*j]*p1;
+                p1=p2-t,p2=p2+t;
+            }
+    }
+}
+Complex A[N+7],B[N+7],C[N+7],D[N+7];
+int a[N+7],b[N+7];
+void mul()
+{
+    FFT_init();
+    for (int i=0;i<N;i++)
+    {
+        A[i]=Complex(a[i]>>L,a[i]&MASK);
+        B[i]=Complex(b[i]>>L,b[i]&MASK);
+    }
+    FFT(A,N),FFT(B,N);
+    for (int i=0;i<N;++i)
+    {
+        int j=(N-i)%N;
+        Complex da=(A[i]-conj(A[j]))*Complex(0,-0.5),
+                db=(A[i]+conj(A[j]))*Complex(0.5,0),
+                dc=(B[i]-conj(B[j]))*Complex(0,-0.5),
+                dd=(B[i]+conj(B[j]))*Complex(0.5,0);
+        C[j]=da*dd+da*dc*Complex(0,1);
+        D[j]=db*dd+db*dc*Complex(0,1);
+    }
+    FFT(C,N),FFT(D,N);
+    for (int i=0;i<N;++i)
+    {
+        long long da=(long long)(C[i].imag()/N+0.5)%modp,
+                  db=(long long)(C[i].real()/N+0.5)%modp,
+                  dc=(long long)(D[i].imag()/N+0.5)%modp,
+                  dd=(long long)(D[i].real()/N+0.5)%modp;
+        a[i]=((dd<<(L*2))+((db+dc)<<L)+da)%modp;
+    }
+}
+
+```
+
+##### 1.8.4 FWT
+时间复杂度 $O(n \log n)$
+```
+#define Maxn 65536
+#define modp 1000000007
+int n;
+long long a[Maxn+7],b[Maxn+7];
+void fwt(long long *a,int n,long long f)
+{
+	for (int i=1;i<n;i<<=1)
+		for (int j=0;j<n;j+=(i<<1))
+			for (int k=0;k<i;k++)
+			{
+				long long x=a[j+k],y=a[j+k+i];
+				a[j+k]=1LL*f*(x+y)%modp;
+				a[j+k+i]=1LL*f*(x-y+modp)%modp;
+				//fwt:
+				//xor:a[j+k]=x+y,a[j+k+i]=(x-y+mod)%mod;    
+                //and:a[j+k]=x+y;    
+                //or:a[j+k+i]=x+y;
+				//dfwt:
+				//xor:a[j+k]=(x+y)/2,a[j+k+i]=(x-y)/2;    
+                //and:a[j+k]=x-y;    
+                //or:a[j+k+i]=y-x;   
+			}
+}
+void multiply()
+{
+    ++n;
+    int len=1;
+    while (len<=n) len<<=1;
+    fwt(a,len,1),fwt(b,len,1);
+    for (int i=0;i<len;i++)
+        a[i]=(1LL*a[i]*b[i])%modp;
+    fwt(a,len,(modp+1)/2);
+}
+
+```
+
+##### 1.8.5 多项式求逆
+给定一个多项式 $F(x)$ ，求出一个多项式 $G(x)$， 满足 $F(x) * G(x) \equiv 1 (\mod x^n)$
+
+时间复杂度 $O(n \log n)$
+
+```
+//8倍数组
+#include <bits/stdc++.h>
+using namespace std;
+#define Maxn 524288
+#define modp 998244353
+#define g 3
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+#define meminit(A,l,r) memset(A+(l),0,sizeof(*A)*((r)-(l)))
+#define memcopy(B,A,l,r) memcpy(B,A+(l),sizeof(*A)*((r)-(l)))
+void FFT(int *a,int n,int f)
+{
+    for (int i=0,j=0;i<n;i++)
+    {
+        if (i>j) swap(a[i],a[j]);
+        for (int t=n>>1;(j^=t)<t;t>>=1);
+    }
+    for (int i=2;i<=n;i<<=1)
+    {
+        static int exp[Maxn+7];
+        exp[0]=1;
+        exp[1]=power(g,(modp-1)/i);
+        if (f==1) exp[1]=power(exp[1],modp-2);
+        for (int k=2;k<(i>>1);k++)
+            exp[k]=(1LL*exp[k-1]*exp[1])%modp;
+        for (int j=0;j<n;j+=i)
+            for (int k=0;k<(i>>1);k++)
+            {
+                int &pA=a[j+k],&pB=a[j+k+(i>>1)];
+                int B=(1LL*pB*exp[k])%modp;
+                pB=(pA-B+modp)%modp;
+                pA=(pA+B)%modp;
+            }
+    }
+    if (f==1)
+    {
+        int rev=power(n,modp-2);
+        for (int i=0;i<n;i++)
+        {
+            a[i]=(1LL*a[i]*rev)%modp;
+            if (a[i]<0) a[i]+=modp;
+        }
+    }
+}
+void getInv(int *a,int *b,int n)
+{
+    static int tmp[Maxn+7];
+    b[0]=power(a[0],modp-2);
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=3*(c-1);M<<=1);
+        meminit(b,c,M);
+        meminit(tmp,c,M);
+        memcopy(tmp,a,0,c);
+        FFT(tmp,M,0);
+        FFT(b,M,0);
+        for (int i=0;i<M;i++)
+            b[i]=1LL*b[i]*(2LL-1LL*tmp[i]*b[i]%modp+modp)%modp;
+        FFT(b,M,1);
+        meminit(b,c,M);
+    }
+}
+int n,a[Maxn+7],b[Maxn+7];
+int main()
+{
+    scanf("%d",&n);
+    for (int i=0;i<n;i++)
+    {
+        scanf("%d",&a[i]);
+        a[i]%=modp;
+    }
+    getInv(a,b,n);
+    for (int i=0;i<n;i++)
+        printf("%d ",b[i]);
+    printf("\n");
+    return 0;
+}
+
+```
+
+##### 1.8.6 多项式取模
+给定一个 $n$ 次多项式 $F(x)$ 和一个 $m$ 次多项式 $G(x)$ ，求出多项式 $Q(x)$, $R(x)$，满足以下条件：
+
+$Q(x)$ 次数为 $n-m$，$R(x)$ 次数小于 $m$, $F(x) = Q(x) * G(x) + R(x)$
+
+时间复杂度 $O(n \log n)$
+
+```
+//8倍数组
+#include <bits/stdc++.h>
+using namespace std;
+#define Maxn 524288
+#define modp 998244353
+#define g 3
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+#define meminit(A,l,r) memset(A+(l),0,sizeof(*A)*((r)-(l)))
+#define memcopy(B,A,l,r) memcpy(B,A+(l),sizeof(*A)*((r)-(l)))
+void FFT(int *a,int n,int f)
+{
+    for (int i=0,j=0;i<n;i++)
+    {
+        if (i>j) swap(a[i],a[j]);
+        for (int t=n>>1;(j^=t)<t;t>>=1);
+    }
+    for (int i=2;i<=n;i<<=1)
+    {
+        static int exp[Maxn+7];
+        exp[0]=1;
+        exp[1]=power(g,(modp-1)/i);
+        if (f==1) exp[1]=power(exp[1],modp-2);
+        for (int k=2;k<(i>>1);k++)
+            exp[k]=(1LL*exp[k-1]*exp[1])%modp;
+        for (int j=0;j<n;j+=i)
+            for (int k=0;k<(i>>1);k++)
+            {
+                int &pA=a[j+k],&pB=a[j+k+(i>>1)];
+                int B=(1LL*pB*exp[k])%modp;
+                pB=(pA-B+modp)%modp;
+                pA=(pA+B)%modp;
+            }
+    }
+    if (f==1)
+    {
+        int rev=power(n,modp-2);
+        for (int i=0;i<n;i++)
+        {
+            a[i]=(1LL*a[i]*rev)%modp;
+            if (a[i]<0) a[i]+=modp;
+        }
+    }
+}
+void getInv(int *a,int *b,int n)
+{
+    static int tmp[Maxn+7];
+    b[0]=power(a[0],modp-2);
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=3*(c-1);M<<=1);
+        meminit(b,c,M);
+        meminit(tmp,c,M);
+        memcopy(tmp,a,0,c);
+        FFT(tmp,M,0);
+        FFT(b,M,0);
+        for (int i=0;i<M;i++)
+            b[i]=1LL*b[i]*(2LL-1LL*tmp[i]*b[i]%modp+modp)%modp;
+        FFT(b,M,1);
+        meminit(b,c,M);
+    }
+}
+void divide(int n,int m,int *a,int *b,int *d,int *r)
+{
+    static int M,tA[Maxn+7],tB[Maxn+7],inv[Maxn+7],tD[Maxn+7];
+    for (;n>0&&a[n-1]==0;n--);
+    for (;m>0&&b[m-1]==0;m--);
+    for (int i=0;i<n;i++) 
+        tA[i]=a[n-i-1];
+    for (int i=0;i<m;i++) 
+        tB[i]=b[m-i-1];
+    for (M=1;M<=n-m+1;M<<=1);
+    if (m<M) meminit(tB,m,M);
+    getInv(tB,inv,M);
+    for (M=1;M<=2*(n-m+1);M<<=1);
+    meminit(inv,n-m+1,M);
+    meminit(tA,n-m+1,M);
+    FFT(inv,M,0);
+    FFT(tA,M,0);
+    for (int i=0;i<M;i++)
+        d[i]=(1LL*inv[i]*tA[i])%modp;
+    FFT(d,M,1);
+    reverse(d,d+n-m+1);
+    for (M=1;M<=n;M<<=1);
+    memcopy(tB,b,0,m);
+    if (m<M) meminit(tB,m,M);
+    memcopy(tD,d,0,n-m+1);
+    meminit(tD,n-m+1,M);
+    FFT(tD,M,0);
+    FFT(tB,M,0);
+    for (int i=0;i<M;i++)
+        r[i]=(1LL*tD[i]*tB[i])%modp;
+    FFT(r,M,1);
+    meminit(r,n,M);
+    for (int i=0;i<n;i++)
+        r[i]=(a[i]-r[i]+modp)%modp;
+}
+int n,m;
+int a[Maxn+7],b[Maxn+7],d[Maxn+7],r[Maxn+7];
+int main()
+{
+    scanf("%d%d",&n,&m);
+    for (int i=0;i<=n;i++)
+    {
+        scanf("%d",&a[i]);
+        a[i]%=modp;
+    }
+    ++n;
+    for (int i=0;i<=m;i++)
+    {
+        scanf("%d",&b[i]);
+        b[i]%=modp;
+    }
+    ++m;
+    divide(n,m,a,b,d,r);
+    for (int i=0;i<=n-m;i++)
+        printf("%d ",d[i]);
+    printf("\n");
+    for (int i=0;i<m-1;i++)
+        printf("%d ",r[i]);
+    printf("\n");
+    return 0;
+}
+
+```
+##### 1.8.7 多项式开根
+时间复杂度 $O(n \log n)$
+
+```
+//8倍数组
+#include <bits/stdc++.h>
+using namespace std;
+#define Maxn 524288
+#define modp 998244353
+#define g 3
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+#define meminit(A,l,r) memset(A+(l),0,sizeof(*A)*((r)-(l)))
+#define memcopy(B,A,l,r) memcpy(B,A+(l),sizeof(*A)*((r)-(l)))
+void FFT(int *a,int n,int f)
+{
+    for (int i=0,j=0;i<n;i++)
+    {
+        if (i>j) swap(a[i],a[j]);
+        for (int t=n>>1;(j^=t)<t;t>>=1);
+    }
+    for (int i=2;i<=n;i<<=1)
+    {
+        static int exp[Maxn+7];
+        exp[0]=1;
+        exp[1]=power(g,(modp-1)/i);
+        if (f==1) exp[1]=power(exp[1],modp-2);
+        for (int k=2;k<(i>>1);k++)
+            exp[k]=(1LL*exp[k-1]*exp[1])%modp;
+        for (int j=0;j<n;j+=i)
+            for (int k=0;k<(i>>1);k++)
+            {
+                int &pA=a[j+k],&pB=a[j+k+(i>>1)];
+                int B=(1LL*pB*exp[k])%modp;
+                pB=(pA-B+modp)%modp;
+                pA=(pA+B)%modp;
+            }
+    }
+    if (f==1)
+    {
+        int rev=power(n,modp-2);
+        for (int i=0;i<n;i++)
+        {
+            a[i]=(1LL*a[i]*rev)%modp;
+            if (a[i]<0) a[i]+=modp;
+        }
+    }
+}
+void getInv(int *a,int *b,int n)
+{
+    static int tmp[Maxn+7];
+    b[0]=power(a[0],modp-2);
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=3*(c-1);M<<=1);
+        meminit(b,c,M);
+        meminit(tmp,c,M);
+        memcopy(tmp,a,0,c);
+        FFT(tmp,M,0);
+        FFT(b,M,0);
+        for (int i=0;i<M;i++)
+            b[i]=1LL*b[i]*(2LL-1LL*tmp[i]*b[i]%modp+modp)%modp;
+        FFT(b,M,1);
+        meminit(b,c,M);
+    }
+}
+void getSqrt(int *a,int *b,int n)
+{
+    static int tmp[Maxn+7],invb[Maxn+7];
+    b[0]=1;
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=2*(c-1);M<<=1);
+        meminit(invb,c,M);
+        getInv(b,invb,c);
+        meminit(tmp,c,M);
+        memcopy(tmp,a,0,c);
+        FFT(invb,M,0);
+        FFT(tmp,M,0);
+        int inv2=(modp+1)/2;
+        for (int i=0;i<M;i++)
+            tmp[i]=(1LL*(1LL*(1LL*tmp[i]*inv2)%modp)*invb[i])%modp;
+        FFT(tmp,M,1);
+        for (int i=0;i<c;i++)
+            b[i]=(1LL*b[i]*inv2+tmp[i])%modp;
+        meminit(b,c,M);
+    }
+}
+int n;
+int a[Maxn+7],b[Maxn+7];
+int main()
+{
+    scanf("%d",&n);
+    for (int i=0;i<n;i++)
+    {
+        scanf("%d",&a[i]);
+        a[i]%=modp;
+    }
+    ++n;
+    getSqrt(a,b,n);
+    for (int i=0;i<n-1;i++)
+        printf("%d ",b[i]);
+    printf("\n");
+    return 0;
+}
+
+```
+
+##### 1.8.8 多项式ln
+给出 $n-1$ 次多项式 $A(x)$，求一个 $\bmod{\:x^n}$ 下的多项式 $B(x)$，满足 $B(x) \equiv \ln A(x)$
+
+时间复杂度 $O(n \log n)$
+
+```
+//8倍数组
+#include <bits/stdc++.h>
+using namespace std;
+#define Maxn 524288
+#define modp 998244353
+#define g 3
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+#define meminit(A,l,r) memset(A+(l),0,sizeof(*A)*((r)-(l)))
+#define memcopy(B,A,l,r) memcpy(B,A+(l),sizeof(*A)*((r)-(l)))
+void FFT(int *a,int n,int f)
+{
+    for (int i=0,j=0;i<n;i++)
+    {
+        if (i>j) swap(a[i],a[j]);
+        for (int t=n>>1;(j^=t)<t;t>>=1);
+    }
+    for (int i=2;i<=n;i<<=1)
+    {
+        static int exp[Maxn+7];
+        exp[0]=1;
+        exp[1]=power(g,(modp-1)/i);
+        if (f==1) exp[1]=power(exp[1],modp-2);
+        for (int k=2;k<(i>>1);k++)
+            exp[k]=(1LL*exp[k-1]*exp[1])%modp;
+        for (int j=0;j<n;j+=i)
+            for (int k=0;k<(i>>1);k++)
+            {
+                int &pA=a[j+k],&pB=a[j+k+(i>>1)];
+                int B=(1LL*pB*exp[k])%modp;
+                pB=(pA-B+modp)%modp;
+                pA=(pA+B)%modp;
+            }
+    }
+    if (f==1)
+    {
+        int rev=power(n,modp-2);
+        for (int i=0;i<n;i++)
+        {
+            a[i]=(1LL*a[i]*rev)%modp;
+            if (a[i]<0) a[i]+=modp;
+        }
+    }
+}
+void getInv(int *a,int *b,int n)
+{
+    static int tmp[Maxn+7];
+    b[0]=power(a[0],modp-2);
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=3*(c-1);M<<=1);
+        meminit(b,c,M);
+        meminit(tmp,c,M);
+        memcopy(tmp,a,0,c);
+        FFT(tmp,M,0);
+        FFT(b,M,0);
+        for (int i=0;i<M;i++)
+            b[i]=1LL*b[i]*(2LL-1LL*tmp[i]*b[i]%modp+modp)%modp;
+        FFT(b,M,1);
+        meminit(b,c,M);
+    }
+}
+void getDiff(int *a,int *b,int n)
+{
+    for (int i=0;i+1<n;i++)
+        b[i]=(1LL*(i+1)*a[i+1])%modp;
+    b[n-1]=0;
+}
+void getInt(int *a,int *b,int n)
+{
+    static int inv[Maxn+7];
+    inv[1]=1;
+    for (int i=2;i<n;i++)
+        inv[i]=(1LL*(modp-modp/i)*inv[modp%i])%modp;
+    b[0]=0;
+    for (int i=1;i<n;i++)
+        b[i]=(1LL*a[i-1]*inv[i])%modp;
+}
+void getLn(int *a,int *b,int n)
+{
+    static int inv[Maxn+7],d[Maxn+7];
+    int M=1;
+    for (;M<=2*(n-1);M<<=1);
+    getInv(a,inv,n);
+    getDiff(a,d,n);
+    meminit(d,n,M);
+    meminit(inv,n,M);
+    FFT(d,M,0);
+    FFT(inv,M,0);
+    for (int i=0;i<M;i++)
+        d[i]=(1LL*d[i]*inv[i])%modp;
+    FFT(d,M,1);
+    getInt(d,b,n);
+}
+int n;
+int a[Maxn+7],b[Maxn+7];
+int main()
+{
+    scanf("%d",&n);
+    for (int i=0;i<n;i++)
+    {
+        scanf("%d",&a[i]);
+        a[i]%=modp;
+    }
+    ++n;
+    getLn(a,b,n);
+    for (int i=0;i<n-1;i++)
+        printf("%d ",b[i]);
+    printf("\n");
+    return 0;
+}
+
+```
+  
+##### 1.8.9 多项式exp
+给出 $n-1$ 次多项式 $A(x)$，求一个 $\bmod{\:x^n}$ 下的多项式 $B(x)$，满足 $B(x) \equiv e^{A(x)}$
+
+时间复杂度 $O(n \log n)$
+
+```
+//8倍数组
+#include <bits/stdc++.h>
+using namespace std;
+#define Maxn 524288
+#define modp 998244353
+#define g 3
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+#define meminit(A,l,r) memset(A+(l),0,sizeof(*A)*((r)-(l)))
+#define memcopy(B,A,l,r) memcpy(B,A+(l),sizeof(*A)*((r)-(l)))
+void FFT(int *a,int n,int f)
+{
+    for (int i=0,j=0;i<n;i++)
+    {
+        if (i>j) swap(a[i],a[j]);
+        for (int t=n>>1;(j^=t)<t;t>>=1);
+    }
+    for (int i=2;i<=n;i<<=1)
+    {
+        static int exp[Maxn+7];
+        exp[0]=1;
+        exp[1]=power(g,(modp-1)/i);
+        if (f==1) exp[1]=power(exp[1],modp-2);
+        for (int k=2;k<(i>>1);k++)
+            exp[k]=(1LL*exp[k-1]*exp[1])%modp;
+        for (int j=0;j<n;j+=i)
+            for (int k=0;k<(i>>1);k++)
+            {
+                int &pA=a[j+k],&pB=a[j+k+(i>>1)];
+                int B=(1LL*pB*exp[k])%modp;
+                pB=(pA-B+modp)%modp;
+                pA=(pA+B)%modp;
+            }
+    }
+    if (f==1)
+    {
+        int rev=power(n,modp-2);
+        for (int i=0;i<n;i++)
+        {
+            a[i]=(1LL*a[i]*rev)%modp;
+            if (a[i]<0) a[i]+=modp;
+        }
+    }
+}
+void getInv(int *a,int *b,int n)
+{
+    static int tmp[Maxn+7];
+    b[0]=power(a[0],modp-2);
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=3*(c-1);M<<=1);
+        meminit(b,c,M);
+        meminit(tmp,c,M);
+        memcopy(tmp,a,0,c);
+        FFT(tmp,M,0);
+        FFT(b,M,0);
+        for (int i=0;i<M;i++)
+            b[i]=1LL*b[i]*(2LL-1LL*tmp[i]*b[i]%modp+modp)%modp;
+        FFT(b,M,1);
+        meminit(b,c,M);
+    }
+}
+void getDiff(int *a,int *b,int n)
+{
+    for (int i=0;i+1<n;i++)
+        b[i]=(1LL*(i+1)*a[i+1])%modp;
+    b[n-1]=0;
+}
+void getInt(int *a,int *b,int n)
+{
+    static int inv[Maxn+7];
+    inv[1]=1;
+    for (int i=2;i<n;i++)
+        inv[i]=(1LL*(modp-modp/i)*inv[modp%i])%modp;
+    b[0]=0;
+    for (int i=1;i<n;i++)
+        b[i]=(1LL*a[i-1]*inv[i])%modp;
+}
+void getLn(int *a,int *b,int n)
+{
+    static int inv[Maxn+7],d[Maxn+7];
+    int M=1;
+    for (;M<=2*(n-1);M<<=1);
+    getInv(a,inv,n);
+    getDiff(a,d,n);
+    meminit(d,n,M);
+    meminit(inv,n,M);
+    FFT(d,M,0);
+    FFT(inv,M,0);
+    for (int i=0;i<M;i++)
+        d[i]=(1LL*d[i]*inv[i])%modp;
+    FFT(d,M,1);
+    getInt(d,b,n);
+}
+void getExp(int *a,int *b,int n)
+{
+    static int ln[Maxn+7],tmp[Maxn+7];
+    b[0]=1;
+    for (int c=2,M=1;c<(n<<1);c<<=1)
+    {
+        for (;M<=2*(c-1);M<<=1);
+        int bound=min(c,n);
+        memcopy(tmp,a,0,bound);
+        meminit(tmp,bound,M);
+        meminit(b,c,M);
+        getLn(b,ln,c);
+        meminit(ln,c,M);
+        FFT(b,M,0);
+        FFT(tmp,M,0);
+        FFT(ln,M,0);
+        for (int i=0;i<M;i++)
+            b[i]=(1LL*b[i]*(1LL-ln[i]+tmp[i]+modp))%modp;
+        FFT(b,M,1);
+        meminit(b,c,M);
+    }
+}
+int n;
+int a[Maxn+7],b[Maxn+7];
+int main()
+{
+    scanf("%d",&n);
+    for (int i=0;i<n;i++)
+    {
+        scanf("%d",&a[i]);
+        a[i]%=modp;
+    }
+    ++n;
+    getExp(a,b,n);
+    for (int i=0;i<n-1;i++)
+        printf("%d ",b[i]);
+    printf("\n");
+    return 0;
+}
+
+```
+
+##### 1.8.10 多点求值
+给定一个 $n$ 次多项式 $f(x)$ ，现在请你对于 $i \in [1,m]$ ，求出 $f(a_i)$
+
+时间复杂度 $O(n \log^2n)$
+
+```
+
+```
+
+##### 1.8.11 拉格朗日插值
+设给出的 $𝑘+1$ 个点分别是 $(𝑥_0,𝑦_0),(𝑥_1,𝑦_1),...,(𝑥_𝑘,𝑦_𝑘)$
+
+则对应的多项式为 $F(x)=\sum_{i=0}^k\frac{\prod_{j \neq i}(x-x_j)}{\prod_{j \neq i}(x_i-x_j)}*y_i$
+
+可以在 $O(k^2)$ 的时间复杂度内求出另一个点的值
+
+$F(x)=\sum_{i=0}^k\frac{F(i)x(x-1)...(x-k)*(-1)^{k-i}}{i!*(k-i)!}$
+
+快速插值：
+
+$g_i=\lim_{x \rightarrow x_i}\frac{\prod_{j=0}^n(x-x_j)}{x-x_i} = (\prod_{j=0}^n(x-x_j))'(x_i)$
+
+分子分母分别分治＋多点求值可以在 $O(n \log^2n)$ 复杂度内求出
+
+##### 1.8.12 K阶齐次线性递推
+
+
+##### 1.8.13 BM算法
+给定一个有 $𝑛$个元素的数列 $𝑎$，其中第 $𝑖$ 个元素是 $𝑎_𝑖$ 。
+
+求一个 较短/最短 的数列 𝑏$，$假设 $𝑏$ 有 $𝑚$ 个元素，那么要求满足
+
+$∀𝑚<𝑖≤𝑛,   𝑎_𝑖=\sum_{j=1}^ma_{i-j}b_j$
+
+时间复杂度 $O(n^2)$
+
+```
+#include <bits/stdc++.h>
+using namespace std;
+#define Maxn 100007
+#define modp 1000000007
+int n,cnt;
+int a[Maxn],fail[Maxn],delta[Maxn];
+vector <int> R[Maxn];
+int power(int a,int b)
+{
+    int res=1,now=a,left=b;
+    while (left>0)
+    {
+        if (left%2==1) res=(1LL*res*now)%modp;
+        left/=2;
+        now=(1LL*now*now)%modp;
+    }
+    return res;
+}
+int main()
+{
+    scanf("%d",&n);
+    for (int i=1;i<=n;i++)
+        scanf("%d",&a[i]);
+    R[0].clear();
+    cnt=0;
+    for (int i=1;i<=n;i++)
+    {
+        if (cnt==0)
+        {
+            if (a[i])
+            {
+                fail[cnt++]=i;
+                delta[i]=a[i];
+                R[cnt].resize(0);
+                R[cnt].resize(i,0);
+            }
+            continue;
+        }
+        int sum=0,m=(int)R[cnt].size();
+        delta[i]=a[i];
+        fail[cnt]=i;
+        for (int j=0;j<m;j++)
+            sum=(sum+1LL*a[i-j-1]*R[cnt][j])%modp;
+        delta[i]=(delta[i]+modp-sum)%modp;
+        if (!delta[i]) continue;
+        int id=cnt-1,v=i-fail[id]+(int)R[id].size();
+        for (int j=0;j<cnt;j++)
+            if (i-fail[j]+(int)R[j].size()<v)
+            {
+                id=j;
+                v=i-fail[j]+(int)R[j].size();
+            }
+        int tmp=(1LL*delta[i]*power(delta[fail[id]],modp-2))%modp;
+        R[cnt+1]=R[cnt];
+        while ((int)R[cnt+1].size()<v) R[cnt+1].push_back(0);
+        R[cnt+1][i-fail[id]-1]=(R[cnt+1][i-fail[id]-1]+tmp)%modp;
+        for (int j=0;j<(int)R[id].size();j++)
+            R[cnt+1][i-fail[id]+j]=(R[cnt+1][i-fail[id]+j]+modp-(1LL*tmp*R[id][j])%modp)%modp;
+        cnt++;
+    }
+    printf("%d\n",(int)R[cnt].size());
+    for (int i=0;i<(int)R[cnt].size();i++)
+        printf("%d ",R[cnt][i]);
+    printf("\n");
+    return 0;
+}
+
+```
+
+### 1.9 pell方程
+对于方程 $x^2-dy^2=1$，其中 $d$是一个非完全平方数的正整数
+
+设最小解为$(x_0,y_0)$
+
+则有：
+
+$x_n=x_0x_{n-1}+dy_0y_{n-1}$
+
+$y_n=y_0x_{n-1}+x_0y_{n-1}$
+
+```
+//solve(d,N)输出最大的(x,y)使得x^2-dy^2=1且x<=N
+void solve(int d,long long N)
+{
+    long long x0=0LL,y0=1LL;
+    for (;;y0++)
+    {
+        x0=(long long)sqrt(1LL*d*y0*y0+1);
+        if (1LL*x0*x0-1LL*d*y0*y0==1LL) break;
+    }
+    long long x=x0,y=y0;
+    long long resx=-1LL,resy=-1LL;
+    while (x<=N)
+    {
+        resx=x,resy=y;
+        long long nowx=1LL*x0*x+1LL*d*y0*y;
+        long long nowy=1LL*y0*x+1LL*x0*y;
+        x=nowx;
+        y=nowy;
+    }
+    printf("%lld %lld\n",resx,resy);
+}
+
+```
+### 1.10 一元三次方程求根公式
+```
+//solve() Ax^3+Bx^2+Cx+D+0 (A!=0)
+//x1,x2,x3无序
+double a,b,c,d;
+void solve(double A,double B,double C,double D)
+{
+    complex<double> i(0,1.0);
+    complex<double> a=A,b=B,c=C,d=D;
+    complex<double> p=(3.0*a*c-b*b)/(3.0*a*a);
+    complex<double> q=(27.0*a*a*d-9.0*a*b*c+2.0*b*b*b)/(27.0*a*a*a);
+    complex<double> delta=pow(p*p*p/27.0+q*q/4.0,0.5);
+    complex<double> tmp1=pow(-q/2.0+delta,1/3.0),tmp2=pow(-q/2.0-delta,1/3.0);
+    complex<double> w=-1/2.0+(pow(3.0,1/2.0)/2.0)*i;
+    complex<double> x1=tmp1+tmp2;
+    complex<double> x2=w*tmp1+w*w*tmp2;
+    complex<double> x3=w*w*tmp1+w*tmp2;
+    x1-=b/(3.0*a);
+    x2-=b/(3.0*a);
+    x3-=b/(3.0*a);
+}
+
+```
+
+### 1.11 simpson积分
+```
+double calc(double L,double R)
+{
+    return (R-L)*(f(L)+f(R)+4.0*f(0.5*(L+R)))/6.0;
+}
+double simpson(double L,double R)
+{
+    double tmp=calc(L,R);
+    double mid=0.5*(L+R);
+    double tmp1=calc(L,mid),tmp2=calc(mid,R);
+    if (fabs(tmp-tmp1-tmp2)<15.0*eps) return tmp1+tmp2;
+    return simpson(L,mid)+simpson(mid,R);
+}
+
+```
+
+### 1.12 整数划分
+把$n$拆成几个小于等于$n$的正整数相加的形式，求方案数
+
+时间复杂度 $O(n\sqrt{n})$
+```
+int ans[100007];
+void get_factorization(int n)
+{
+    memset(ans,0,sizeof(ans));
+    ans[0]=1;
+    for (int i=1;i<=n;i++)
+        for (int j=1,r=1;i>=(3*j*j-j)/2;j++,r*=-1)
+        {
+            ans[i]+=ans[i-(3*j*j-j)/2]*r;
+            ans[i]=(ans[i]%modp+modp)%modp;
+            if (i>=(3*j*j+j)/2)
+            {
+                ans[i]+=ans[i-(3*j*j+j)/2]*r;
+                ans[i]=(ans[i]%modp+modp)%modp;
+            }
+        }
+}
+
+```
+
+把$n$拆成几个小于等于$n$的正整数相加的形式，相同的数不能超过$k$个，求方案数
+
+```
+int ans[100007];
+void get_factorization(int n)
+{
+    memset(ans,0,sizeof(ans));
+    ans[0]=1;
+    for (int i=1;i<=n;i++)
+        for (int j=1,r=1;i>=(3*j*j-j)/2;j++,r*=-1)
+        {
+            ans[i]+=ans[i-(3*j*j-j)/2]*r;
+            ans[i]=(ans[i]%modp+modp)%modp;
+            if (i>=(3*j*j+j)/2)
+            {
+                ans[i]+=ans[i-(3*j*j+j)/2]*r;
+                ans[i]=(ans[i]%modp+modp)%modp;
+            }
+        }
+}
+int solve(int n,int k)
+{
+    int res=ans[n];
+    for (int j=1,r=-1;n>=k*(3*j*j-j)/2;j++,r*=-1)
+    {
+        res+=ans[n-k*(3*j*j-j)/2]*r;
+        res=(res%modp+modp)%modp;
+        if (n>=k*(3*j*j+j)/2)
+        {
+            res+=ans[n-k*(3*j*j+j)/2]*r;
+            res=(res%modp+modp)%modp;
+        }
+    }
+    return res;
+}
+
+```
+
+### 1.13 min-max容斥
+$max(S)$表示S集合最大值的期望，$min(S)$表示S集合最小值的期望
+
+$max(S)=\sum_{T \subset S}(-1)^{|T|-1}min(T)$
+
+$max(S,k)=\sum_{T \subset S}(-1)^{|T|-k}C(|T|-1,k-1)min(T)$
+
+$T$可以取$S$，不可取空集
+
+其中 $max(S,k)$表示$S$集合中第$k$大的元素
+
+### 1.14 线性基
+```
+//cnt!=n说明可以构成0
+//insert()线性基插入一个数
+//process()处理线性基
+//query(x)询问可以构成的第x小
+long long s[67];
+int n,q,cnt;
+void insert(long long x)
+{
+    for (int i=60;i>=0;i--)
+        if (x&(1LL<<i))
+        {
+            if (s[i]) x^=s[i];
+            else 
+            {
+                s[i]=x;
+                break;
+            }
+        }
+}
+void process()
+{
+    for (int i=60;i>=0;i--)
+        for (int j=i-1;j>=0;j--)
+            if (s[i]&(1LL<<j)) s[i]^=s[j];
+}
+long long query(long long x)
+{
+    if (cnt!=n) --x;
+    if (x==0LL) return 0LL;
+    long long res=0LL;
+    for (int i=0;i<=60;i++)
+        if (s[i])
+        {
+            if (x%2==1) res^=s[i];
+            x/=2;
+        }
+    if (x) return -1LL;
+    return res;
+}
+void solve()
+{
+    scanf("%d",&n);
+    memset(s,0,sizeof(s));
+    for (int i=1;i<=n;i++)
+    {
+        long long x;
+        scanf("%lld",&x);
+        insert(x);
+    }
+    process();
+    cnt=0;
+    for (int i=0;i<=60;i++)
+        if (s[i]!=0) ++cnt;
+    scanf("%d",&q);
+    for (int i=1;i<=q;i++)
+    {
+        long long x;
+        scanf("%lld",&x);
+        printf("%lld\n",query(x));
+    }
+}
+
+```
+
+### 1.15 Stern-Brocot树
+
+![avator](https://images2017.cnblogs.com/blog/1138635/201710/1138635-20171020091559959-1244161674.png)
+
+$M(L)=\left[ \begin{matrix} 1 & 1\\ 0 & 1 \end{matrix}\right]$
+
+$M(R)=\left[ \begin{matrix} 1 & 0\\ 1 & 1 \end{matrix}\right]$
+
+$f(M(S))=\left[ \begin{matrix} n & n' \\ m & m' \end{matrix}\right]=\frac{m+m'}{n+n'}$
+
+### 1.16 数相关
+##### 1.16.1 Stirling数
+第一类Stirling数：将$p$个不同的物品排成$k$个非空循环排列的方法数
+
+$S(p,0)=0, p \geq 1$
+
+$S(p,p)=1, p \geq 0$
+
+$S(p,k)=(p-1)S(p-1,k)+S(p-1,k-1), p-1 \geq k \geq 1$
+
+第二类Stirling数：将$p$个不同的物品分成$k$个不可辨别的非空集合的方法数
+
+$S(p,0)=0, p \geq 1$
+
+$S(p,p)=1, p \geq 0$
+
+$S(p,k)=kS(p-1,k)+S(p-1,k-1), p-1 \geq k \geq 1$
+
+$S(n,m)=\frac{1}{m!}\sum_{k=0}^m(-1)^kC(m,k)(m-k)^n=\sum_{k=0}^m\frac{(-1)^k}{k!}*\frac{(m-k)^n}{(m-k)!}$
+
+| $k$ 个球 | $m$ 个盒子 | 是否允许有空盒子 | 方案数 |  
+| --- | --- | --- | --- |
+| 各不相同 | 各不相同 | 是 | $m^k$ |
+| 各不相同 | 各不相同 | 否 | $m!Stirling2(k,m)$ |
+| 各不相同 | 完全相同 | 是 | $\sum_{i=1}^mStirling2(k,i)$ |
+| 各不相同 | 完全相同 | 否 | $Stirling2(k,m)$ |
+| 完全相同 | 各不相同 | 是 | $C(m+k-1,k)$ |
+| 完全相同 | 各不相同 | 否 | $C(k-1,m-1)$ |
+| 完全相同 | 完全相同 | 是 | $\frac{1}{(1-x)(1-x^2)...(1-x^m)}$的$x^k$系数 |
+| 完全相同 | 完全相同 | 否 | $\frac{x^m}{(1-x)(1-x^2)...(1-x^m)}$的$x^k$系数 |
+
+##### 1.16.2 Catalan数
+$h_1=1$
+
+$h_n=\sum_{k=0}^{n-1}h_k*h_{n-1-k}$
+
+$h_n=h_{n-1}*\frac{4n-2}{n+1}=\frac{C(2n,n)}{n+1}=C(2n,n)-C(2n,n-1)$
+
+在一个格点阵列中,从$(0, 0)$点走到$(n, m)$点且不经过对角线$x = y$的方法数 $(x > y) = C(n + m -1, m) − C(n + m-1, m − 1)$
+
+在一个格点阵列中,从$(0, 0)$点走到$(n, m)$点且不穿过对角线$x = y$的方法数 $(x \geq y) = C(n + m, m) − C(n + m, m − 1)$
+
+##### 1.16.3 Fibonacci数
+设$F_n$在$\mod x$意义下的最短循环节是 $G(x)$
+
+对于素数$p$，$G(p)$要么是 $p-1$的因子，要么是 $2(p+1)$的因子
+
+对于素数$p$，$G(p^k)=G(p)*p^{k-1}$
+
+##### 1.16.4 Bell数
+贝尔数表示把$n$个带标号的物品划分为若干个不相交的集合的方案数
+
+$B_0=0$
+
+$B_{n+1}=\sum_{k=0}^{n}C(n,k)B_k$
+
+$B_n=\sum_{k=1}^{n}S(n,k)$，其中$S(n,k)$表示第二类Sitrling数
+
+$B_n=\sum_{m=0}^{n}S(n,m)=\sum_{m=0}^n\frac{1}{m!}\sum_{k=0}^m(-1)^kC(m,k)(m-k)^n=\sum_{m=0}^n\sum_{k=0}^m\frac{(-1)^k}{k!}\frac{(m-k)^n}{(m-k)!}$
+
+通过维护前缀和可以在 $O(n\log n)$ 复杂度内求出单个贝尔数
+
+对于素数$p$，有$B_{p^m+n} \equiv mB_n+B_{n+1} (\mod p)$
+
+##### 1.16.5 伯努利数
+$B_0=1$
+
+$\sum_{k=0}^nC(n+1,k)B_k=n+1$
+
+$\sum_{i=1}^ni^m=\frac{1}{m+1}\sum_{k=0}^mC(m+1,k)B_kn^{m+1-k}$
+
+其中$m=0$时不成立
+
+（注意：$B_1=\frac{1}{2}$,和常规意义下的伯努利数不同）
+
+### 1.17 定理相关
+##### 1.17.1 Cayley公式
+设 $T_{n,k}$ 为 $n$ 个有标号点分成 $k$ 棵树的森林数，其中节点 $1,2,...,k$ 属于不同的树，则 
+
+$T_{n,k}=kn^{n-k-1}$
+
+##### 1.17.2 Jacobi's Four Square Theorem
+设 $a^2+b^2+c^2+d^2=n$ 的自然数解个数为 $r4(n)$,$d(n)$ 为 n 的约数和
+
+若 $n$ 是奇数,则 $r4(n) = 8d(n)$,否则 $r4(n) = 24d(n/2)$
+
+##### 1.17.3 Matrix-Tree定理
+$G$ 的度数矩阵 $D[G]$ 是一个 $n∗n$ 的矩阵当 $i≠j$ 时, $d[i][j]=0$ ;当 $i=j$ 时， $d[i][j]$ 等于 $i$ 的度数
+
+$G$的邻接矩阵 $A[G]$ 
+
+我们定义 $G$ 的 $Kirchhoff$ 矩阵(也称为拉普拉斯算子) $C[G]=D[G]−A[G]$ 
+
+则 $Matrix-Tree$ 定理可以描述为：
+
+$G$ 的所有不同的生成树的个数等于其 $Kirchhoff$ 矩阵 $C[G]$ 任何一个 $n−1$ 阶主子式的行列式的绝对值
+ 
+无向图生成树计数：$d[i][i]$ 等于 $i$ 的度数
+
+有向图外向生成树计数：$d[i][i]$ 等于 $i$ 的入度数
+
+有向图内向生成树计数：$d[i][i]$ 等于 $i$ 的出度数
+
+##### 1.17.4 平面图欧拉公式
+对于连通的平面图，封闭区域 $F$ = 边数 $V$ - 点数 $E$ +1
+
+##### 1.17.5 蔡勒公式
+$w=((y+[\frac{y}{4}]+[\frac{c}{4}]-2c+[\frac{26(m+1)}{10}]+d-1) \mod 7 + 7 )\mod 7$
+
+如果日期在1582年10月4日或以前，则
+
+$w=((y+[\frac{y}{4}]-c+[\frac{26(m+1)}{10}]+d+4) \mod 7 + 7 )\mod 7$
+
+一二月要看成前一年的13、14月
+
+##### 1.17.6 皮克定理
+给定顶点坐标均是整点(或正方形格点)的简单多边形, 
+
+$S$ (面积) = $n$ (内部格点数目）+ $\frac{1}{2} s$ （边上格点数目） -1
+
+##### 1.17.7 组合数LCM
+$(n+1)lcm(C(n,0),C(n,1),...,C(n,k)) = lcm(n+1,n,n−1,n−2,...,n−k+1)$
+
+##### 1.17.8 错排公式
+$D_1=0,D_2=1,D_n=(n-1)(D_{n-2}+D_{n-1})$
+
+##### 1.17.9 Prufer Sequence
+Prufer sequence是一个描述一棵树的编号序列。
+
+对于一棵树：我们每次选择编号最小的叶子节点，并将它的父亲编号加入序列，然后删除改点，直到整棵树只剩下 $2$ 个顶点。
+
+对于一个prufer序列：我们建立初始为 $1～n$ 的集合 $S$ ,每一次找出在 $S$ 中出现的且不在prufer序列中出现的最小数，将它和序列中的第一项相连，然后删除序列中的第一项和 $S$ 中的这个树，直到整个序列被删除。
+
+树的形态一共有 $n^{n-2}$ 个，而prufer序列也一共有 $n^{n-2}$ 个，它们形成一一对应关系。
+
+##### 1.17.10 二项式反演
+$f(n)=\sum_{k=0}^nC(n,k)g(k)$
+
+$g(n)=\sum_{k=0}^n(-1)^{n-k}C(n,k)f(k)$
+
+##### 1.17.11 $x^k$转化
+$x^k=\sum_{i=1}^kStirling2(k,i)*i!*C(x,i)$
+
+##### 1.17.12 BEST Theorem
+从 $i$ 出发并且回到 $i$ 的欧拉回路：
+
+有向图：以 $i$ 为根的外向树 * (每个点的度数-1)!
+
+无向图：生成树 * (每个点的度数-1)!
+
+##### 1.17.13 拉格朗日四平方和定理
+每个正整数均可表示为4个整数的平方和
+
+##### 1.17.14 第$k$小期望
+$f_n(k)$ 表示有 $n$ 个变量，和为1，第 $k$ 小的期望
+
+$f_n(1)=\frac{1}{n^2}$
+
+$f_n(k)=\frac{1}{n^2}+(1-\frac{1}{n})f_{n-1}(k-1)$
+
+##### 1.17.15 Stirling公式
+$n! \approx \sqrt{2 \pi n}(\frac{n}{e})^n$
+
+##### 1.17.16 泰勒展开
+$f(x)=f(x_0)+f'(x_0)(x-x_0)+\frac{1}{2!}f''(x_0)(x-x_0)^2+...+\frac{1}{n!}f^{(n)}(x_0)(x-x_0)^n$
+
+##### 1.17.17 polya定理
+记置换 $G=\{a_1,...,a_k\}$，在$[1,m]^n$上，不同的向量数目为 $L=(\sum_{i=1}^km^{l(a_i)})/|G|$
+
+其中 $l(a_i)$ 表示置换 $a_i$ 可以展开为循环的节数，比如(1 2)(3 4)(5)就是3节循环
+
+要保证$G$中不含重复的置换
+
+### 1.18 博弈论
+##### 1.18.1 sg函数
+一个局面的 SG 为 mex(后继局面的 SG) , mex 运算为集合中没出现的最小的自然数
+
+几个局面的和的 SG 为单个的 SG 异或 , SG 不为 0 时先手必胜 , SG 为 0 时后手必胜
+
+##### 1.18.2 Nim Game
+$n$ 堆石子,每次可以从一堆里面取任意个石子
+
+对于一堆石子,SG 函数就是石子数。整个游戏的 SG 函数是每一堆石子的 SG 函数的异或和
+
+先手必胜 : SG 不为 0 ; 先手必败 : SG 为 0
+
+##### 1.18.3 Bash Game
+每次最多取 $m$ 个石子,其他同 Nim
+
+一堆石子的 SG 函数为石子数 $\mod (m + 1)$
+
+先手必胜 : SG 不为 0 ; 先手必败 : SG 为 0
+
+##### 1.18.4 Nim-k Game
+每次最多可以同时从 $k$ 堆石子进行操作,这 $k$ 堆可以取不同数量的石子
+
+一堆石子的 SG 函数为石子数,对每一个二进制位单独算,求 SG 函数每一个二进制位 1 的个数 $\mod (k + 1)$ ,如果都为 0 ,则必败,否则必胜
+
+##### 1.18.5 Anti-Nim Game
+不能取石子的一方获胜
+
+必胜: SG 不为 0 且至少有一堆石子数大于 1 或 SG 为 0 且每一堆石子数都不超过 1
+
+必败:其余为必败
+
+##### 1.18.6 Anti-SG Game
+SG 游戏中最先不能行动的一方获胜
+
+必胜:SG 不为 0 且至少有一个游戏的 SG 大于 1 或 SG 为 0 且每一个游戏的 SG 都不超过 1
+
+必败:其余为必败
+
+##### 1.18.7 Staircase Nim
+阶梯博弈,每次可以从一个阶梯上拿掉任意数量石子放到下一层阶梯,不能操作的为输
+
+SG 函数为奇数阶梯上的石子的异或和,如果移动偶数层的石子到奇数层,对手一定可以 继续移动这些石子到偶数层,使得其 SG 不变
+
+先手必胜 : SG 不为 0 ; 先手必败 : SG 为 0
+
+##### 1.18.8 Lasker's Nim Game
+$n$ 堆石子,每次可以从一堆里面取任意个石子,或者选择某堆至少为 2 的石子,分成两堆非空石子。
+
+$SG(0) = 0,SG(1) = 1,SG(2) = 2,SG(3) = 4$
+
+对于 $k \geq 1,SG(4k) = 4k−1, SG(4k+1) = 4k+1, SG(4k+2) = 4k+2, SG(4k+3) = 4k+4 $
+
+先手必胜 : SG 不为 0 ; 先手必败 : SG 为 0
+
+##### 1.18.9 Wythoff Game
+有两堆石子,每次可以从一堆或者两堆里拿走一样数目的石子,不能取的为输
+
+必败态为 $(1, 2), (3, 5), (4, 7), (6, 10)...$
+
+差为 $1, 2, 3, 4.....$ 每一对数的第一个数为前面没出现的最小的正整数
+
+$a_k=[\frac{k(1+\sqrt5)}{2}]$, $b_k=a_k+k$
+
+##### 1.18.10 树上删边游戏
+给定一棵 $n$ 个点的有根树, 每次可以删掉一个子树, 则叶子节点的 SG 值为 0, 非叶子节点的 SG 值为其所有孩子节点 (SG 值 +1) 的异或和
+
+先手必胜 : SG 不为 0 ; 先手必败 : SG 为 0
+
+##### 1.18.11 无向图删边游戏
+把奇环缩成一个点加一条新边,把偶环缩成一个点,不影响 SG,然后套用树上删边游戏
+
+##### 1.18.12 翻硬币游戏
+$n$ 枚硬币排成一排,有的正面朝上,有的反面朝上。游戏者根据某些约束翻硬币(如:每次只能翻一或两枚,或者每次只能翻连续的几枚),但他所翻动的硬币中,最右边的必须是从正面翻到反面,谁不能翻谁输
+
+局面的 SG 值等于局面中每个正面朝上的棋子单一存在（只有它正面朝上，其余都正面向下）时的 SG 值的异或和
+
+每一次只能翻转一枚硬币：$SG(0) = 0,SG(k) = 1(k > 0)$
+
+每一次可以翻转一枚或两枚硬币: $SG(n) = n$
+
+每次必须翻动两个硬币,而且这两个硬币的距离要在可行集 $S = 1, 2, 3$ 中: Bash Game
+
+每一次必须翻连续的 $n$ 个硬币: $SG(nk) = 1(k > 0)$,其他 SG 函数值为 0
+
+每一次可以翻任意长度的连续一段硬币,SG(x) 为 x 中包含的 2 的最高次幂,即 $SG(x) = ⌊log_2 x⌋ + 1$
+
+先手必胜 : SG 不为 0 ; 先手必败 : SG 为 0
+
+##### 1.18.13 $K$倍动态减法游戏
+有一个整数 $S(S \geq 2)$,两个人想让它变成 0。首先,第一个人需要把 $S$ 减掉一个正数 $x(0 < x < S)$。之后双方轮流把 $S$ 减掉一个正整数,但都不能超过先前一回合对方减掉的数的 $K(1 \leq K \leq 100000)$ 倍,减到 0 的一方获胜。问谁会获得胜利,若胜利还要求先手第一步至少减去多少。
+
+Claris代码：
+```
+const int N=750000;
+int i,j;
+ll n,k,a[N],b[N],ans;
+int main()
+{
+	scanf(”%lld%lld”,&n,&k); 
+    a[1]=b[1]=1; 
+    for(i=2,j=0;;i++)
+    {
+		a[i]=b[i−1]+1; 
+        if(a[i]>=n)break; 
+        while(a[j+1]*k<a[i])j++; 
+        b[i]=a[i]+b[j];
+	}
+	while(a[i]>n)i−−; 
+    if(a[i]==n)puts(”lose”); 
+    else
+    {
+		while(n)
+        { 
+        	while(a[i]>n)i−−; 
+            n−=a[i]; 
+            ans=a[i];
+		}
+    	printf(”%lld”,ans);
+  	}
+}
+```

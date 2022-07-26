@@ -1,0 +1,3316 @@
+<div style='text-align: center'>
+  <span style='font-size: 2.3em; font-weight: bold'>ACM常用算法整理</span>
+</div>
+<div style='text-align: right'>
+  <span style='font-size: 1.5em; font-weight: bold'>------by Kokushi Muso</span>
+</div>
+
+<div style='text-align: right'>
+  <span style='font-size: 1.5em; font-weight: bold'>2019.9     </span>
+</div>
+
+- 4 graph utility
+  - 4.1 最短路
+    - 4.1.1 最短路（堆优化spfa）
+    - 4.1.2 次短路
+    - 4.1.3 K短路
+  - 4.2 差分约束
+  - 4.3 最小生成树
+    - 4.3.1 最小生成树
+    - 4.3.2 次小生成树
+    - 4.3.3 曼哈顿最小生成树
+  - 4.4 Kruskal重构树
+  - 4.5 生成树计数
+  - 4.6 最小树形图
+  - 4.7 Tarjan
+    - 4.7.1 有向图强连通分量
+    - 4.7.2 无向图割点+桥
+  - 4.8 支配树
+  - 4.9 二分图匹配
+    - 4.9.1 匈牙利
+    - 4.9.2 Hopcroft-Karp
+    - 4.9.3 二分图最大权匹配（Kuhn-Munkres）
+    - 4.9.4 二分图关键点／边判定
+  - 4.10 一般图匹配
+    - 4.10.1 带花树
+    - 4.10.2 一般图最大权匹配
+  - 4.11 网络流
+    - 4.11.1 最大流（dinic）
+    - 4.11.2 费用流（spfa）
+    - 4.11.3 费用流（dijkstra）
+    - 4.11.4 全局最小割
+    - 4.11.5 最小割树
+  - 4.12 最大团
+  - 4.13 2-SAT
+    - 4.13.1 任意解
+    - 4.13.2 字典序最小解
+  - 4.14 LCA
+    - 4.14.1 倍增
+    - 4.14.2 ST表
+    - 4.14.3 离线tarjan
+  - 4.15 欧拉回路
+    - 4.15.1 有向图
+    - 4.15.2 无向图
+    - 4.15.3 混合图
+  - 4.16 图的绝对中心
+  - 4.17 虚树
+  - 4.18 点分治
+    - 4.18.1 点分治
+    - 4.18.2 点分树
+  - 4.19 斯坦纳树
+
+# 4 graph utility
+### 4.1 最短路
+##### 4.1.1 最短路（堆优化spfa）
+```
+//O(nlogn)
+struct data{
+	ll val;int id;
+	bool operator < (const data &b)const
+	{
+		return val>b.val;
+	}
+};
+struct edge{
+	int to,nxt,w;
+}e[2000010];
+int hd[400010],ptr;
+void addedge(int x,int y,int w)
+{
+	e[++ptr]=(edge){y,hd[x],w};hd[x]=ptr;
+}
+ll dis[400010];
+bool ex[400010];
+data g(int x){return (data){dis[x],x};}
+int n,m;
+void spfa(int S)
+{
+	memset(dis,127/3,sizeof dis);dis[S]=0;
+	priority_queue<data>q;
+	q.push(g(S));ex[S]=1;
+	while(!q.empty())
+	{
+		data tp=q.top();q.pop();
+		int h=tp.id;
+		for(int i=hd[h];i;i=e[i].nxt)
+		if(dis[e[i].to]>dis[h]+e[i].w)
+		{
+			int to=e[i].to;
+			dis[to]=dis[h]+e[i].w;
+			if(!ex[to])ex[to]=1,q.push(g(to));
+		}
+		ex[h]=0;
+	}
+}
+int main()
+{
+	n=in();m=in();
+	int S=in(); 
+	for(int x,y,w,i=1;i<=m;++i)
+	{
+		x=in();y=in();w=in();
+		addedge(x,y,w);
+	}
+	spfa(S);
+	for(int i=1;i<=n;++i)
+		printf("%lld ",dis[i]);
+}
+```
+##### 4.1.2 次短路
+```
+//O(nlogn)
+const int MAXN = 5000 + 10;
+const int INF = 1e9 + 7;
+struct edge{
+	int to, cost;
+	edge(int tv = 0, int tc = 0):
+		to(tv), cost(tc) {}
+};
+typedef pair<int ,int> P;
+int N, R;
+vector<edge> graph[MAXN];
+int dist[MAXN];     //最短距离
+int dist2[MAXN];    //次短距离
+
+void solve()
+{
+	fill(dist, dist+N, INF);
+	fill(dist2, dist2+N, INF);
+	priority_queue<P, vector<P>, greater<P> > Q;
+	dist[0] = 0;
+	Q.push(P(0, 0));
+	while(!Q.empty())
+	{
+		P p = Q.top();
+		Q.pop();
+		int v = p.second, d = p.first;
+		if(dist2[v] < d) continue;
+		for(unsigned i = 0; i < graph[v].size(); i++)
+		{
+			edge &e = graph[v][i];
+			int d2 = d + e.cost;
+			if(dist[e.to] > d2)
+			{
+				swap(dist[e.to], d2);
+				Q.push(P(dist[e.to], e.to));
+			}
+			if(dist2[e.to] > d2 && dist[v] < d2)
+			{
+				dist2[e.to] = d2;
+				Q.push(P(dist2[e.to], e.to));
+			}
+		}
+	}
+	printf("%d\n", dist2[N-1]);
+}
+int main()
+{
+	int A, B, D;
+	scanf("%d%d", &N, &R);
+	for(int i = 0; i < R; i++)
+	{
+		scanf("%d%d%d", &A, &B, &D);
+		graph[A-1].push_back(edge(B-1, D));
+		graph[B-1].push_back(edge(A-1, D));
+	}
+	solve();
+}
+```
+##### 4.1.3 K短路
+```
+//O(nlogn+mlogm+klogk)
+typedef pair<int,int>P;
+const int N=1010,M=100010,inf=~0U>>1;
+int n,m,i,S,T,K,x,y,z;
+int g[N],v[M],u[M],w[M],nxt[M],d[N],f[N],h[N],tot;
+bool is[M],vis[N];
+struct Node {
+	int l,r,d;
+	P v;
+	Node() {}
+	Node(int _l,int _r,int _d,P _v) {
+		l=_l,r=_r,d=_d,v=_v;
+	}
+} pool[2000010];
+int build(P v) {
+	pool[++tot]=Node(0,0,0,v);
+	return tot;
+}
+int merge(int a,int b) {
+	if(!a||!b)return a+b;
+	if(pool[a].v>pool[b].v)swap(a,b);
+	int x=++tot;
+	pool[x]=pool[a];
+	pool[x].r=merge(pool[a].r,b);
+	if(pool[pool[x].l].d<pool[pool[x].r].d)swap(pool[x].l,pool[x].r);
+	pool[x].d=pool[x].r?pool[pool[x].r].d+1:0;
+	return x;
+}
+void getdis() {
+	int i,x;
+	priority_queue<P,vector<P>,greater<P> >q;
+	for(i=1; i<=n; i++)d[i]=inf,f[i]=0;
+	q.push(P(d[T]=0,T));
+	while(!q.empty()) {
+		P t=q.top();
+		q.pop();
+		if(t.first>d[x=t.second])continue;
+		for(i=g[x]; i; i=nxt[i])if(d[v[i]]>d[x]+w[i]) {
+				f[v[i]]=i;
+				q.push(P(d[v[i]]=d[x]+w[i],v[i]));
+			}
+	}
+}
+void dfs(int x) {
+	if(!f[x]||vis[x])return;
+	vis[x]=1;
+	dfs(u[f[x]]);
+	h[x]=merge(h[x],h[u[f[x]]]);
+}
+void add(int x,int y,int z) {
+	v[++m]=x;
+	u[m]=y;
+	w[m]=z;
+	nxt[m]=g[y];
+	g[y]=m;
+}
+int solve() {
+	int mm=m;
+	for(m=0,i=1; i<=n; i++)g[i]=0;
+	while(mm--)scanf("%d%d%d",&x,&y,&z),add(x,y,z);
+	scanf("%d%d%d",&S,&T,&K);
+	if(S==T)K++;
+	getdis();
+	if(d[S]==inf)return -1;
+	if(K==1)return d[S];
+	K--;
+	for(i=1; i<=m; i++)is[i]=0;
+	for(tot=0,i=1; i<=n; i++)is[f[i]]=1,h[i]=vis[i]=0;
+	for(i=1; i<=m; i++)if(!is[i]&&d[u[i]]<inf)
+			h[v[i]]=merge(h[v[i]],build(P(w[i]-d[v[i]]+d[u[i]],u[i])));
+	for(i=1; i<=n; i++)dfs(i);
+	priority_queue<P,vector<P>,greater<P> >q;
+	int ans,x,y;
+	y=h[S];
+	if(y)q.push(P(d[S]+pool[y].v.first,y));
+	while(!q.empty()&&K) {
+		K--;
+		P t=q.top();
+		q.pop();
+		ans=t.first;
+		x=t.second,y=pool[x].l;
+		if(y)q.push(P(ans-pool[x].v.first+pool[y].v.first,y));
+		y=pool[x].r;
+		if(y)q.push(P(ans-pool[x].v.first+pool[y].v.first,y));
+		y=h[pool[x].v.second];
+		if(y)q.push(P(ans+pool[y].v.first,y));
+	}
+
+	return K?-1:ans;
+}
+int main()
+{
+	while(~scanf("%d%d",&n,&m))
+		printf("%d\n",solve());
+}
+```
+
+### 4.2 差分约束
+```
+//O(nlogn)
+const int maxn=1e5+5;
+const int INF=1e9+7;
+struct sd{
+	int to,ww,next;
+}edge[maxn<<1];
+queue<int> que;
+int dis[maxn],num[maxn],head[maxn],n,m,cnt;
+bool vis[maxn];
+void add_edge(int a,int b,int ww)
+{
+	edge[++cnt].next=head[a];
+	edge[cnt].to=b;
+	edge[cnt].ww=ww;
+	head[a]=cnt;
+}
+bool spfa()
+{
+	for(int i=1;i<=n;i++)
+	dis[i]=1,vis[i]=1,que.push(i);
+	while(!que.empty())
+	{
+		int v=que.front();que.pop();vis[v]=0;
+		for(int i=head[v];i;i=edge[i].next)
+		{
+			int to=edge[i].to;
+			if(dis[to]<dis[v]+edge[i].ww)
+			{
+				dis[to]=dis[v]+edge[i].ww;
+				if(!vis[to]) 
+				{
+					if(++num[to]>n) return 0;
+					vis[to]=1,que.push(to);
+				}
+			}
+		}
+	}
+	return 1;
+}
+int main()
+{
+	int ord,a,b;
+	ll ans=0;
+	scanf("%d%d",&n,&m);
+	for(int i=1;i<=m;i++)
+	{
+		scanf("%d%d%d",&ord,&a,&b);
+		if(ord==1) add_edge(a,b,0),add_edge(b,a,0);//a==b	
+		if(ord==2) {if(a==b){printf("-1");return 0;}add_edge(a,b,1);}//a<b
+		if(ord==3) add_edge(b,a,0);//a>=b
+		if(ord==4) {if(a==b){printf("-1");return 0;}add_edge(b,a,1);}//a>b
+		if(ord==5) add_edge(a,b,0);//a<=b
+	}
+	if(!spfa()) {printf("-1");return 0;}
+	for(int i=1;i<=n;i++) ans+=dis[i];
+	printf("%lld",ans);
+}
+```
+
+### 4.3 最小生成树
+##### 4.3.1 最小生成树
+```
+//O(mlogn)
+struct da{
+	int x,y,w;
+	void scan()
+	{
+		x=in();y=in();w=in(); 
+	}
+	bool operator < (const da &b)const
+	{
+		return w<b.w;
+	}
+}d[200010];
+int f[5010];
+int ff(int x){return f[x]==x?x:f[x]=ff(f[x]);}
+int main()
+{
+	int n=in(),m=in();
+	for(int i=1;i<=m;++i)
+		d[i].scan();
+	for(int i=1;i<=n;++i)
+		f[i]=i;
+	sort(d+1,d+m+1);
+	ll ans=0;
+	for(int i=1;i<=m;++i)
+	{
+		int x=d[i].x,y=d[i].y;
+		if(ff(x)!=ff(y))
+		{
+			f[ff(x)]=ff(y);
+			ans=ans+d[i].w;
+		}
+	}
+	printf("%lld\n",ans);
+}
+```
+##### 4.3.2 次小生成树
+```
+//O(mlogn)
+//严格次小生成树
+const int N = 1e5 + 10;
+int n, m, now = 1;
+struct Node
+{
+	int u, v, w, is_in;
+	bool operator <(const Node a)const
+	{
+		return w < a.w;
+	}
+} E[N * 3];
+struct Node_2
+{
+	int u, v, w, nxt;
+} G[(N * 3) << 1];
+int fa[N][30], Max[N][30], Tmax[N][30], deep[N], head[N], father[N];
+int Mi[30];
+long long Answer;
+int Min = 1e9;
+void Add(int u, int v, int w)
+{
+	G[now].v = v;
+	G[now].w = w;
+	G[now].nxt = head[u];
+	head[u] = now ++;
+}
+int Getfa(int x)
+{
+	return father[x] == x ? x : father[x] = Getfa(father[x]);
+}
+
+void Mst()
+{
+	int js(0);
+	for(int i = 1; js != n - 1; i ++)
+	{
+		int u = E[i].u, v = E[i].v, fu = Getfa(u), fv = Getfa(v);
+		if(fu != fv)
+		{
+			father[fu] = fv;
+			js ++;
+			E[i].is_in = 1;
+			Answer += (ll)E[i].w;
+			Add(E[i].u, E[i].v, E[i].w);
+			Add(E[i].v, E[i].u, E[i].w);
+		}
+	}
+}
+
+void Dfs(int x, int f_, int dep)
+{
+	deep[x] = dep;
+	for(int i = 1; ; i ++)
+	{
+		if(deep[x] - Mi[i] < 0) break;
+		fa[x][i] = fa[fa[x][i - 1]][i - 1];
+		Max[x][i] = max(Max[x][i - 1], Max[fa[x][i - 1]][i - 1]);
+		if(Max[x][i - 1] == Max[fa[x][i - 1]][i - 1])
+			Tmax[x][i] = max(Tmax[x][i - 1], Tmax[fa[x][i - 1]][i - 1]);
+		else
+			Tmax[x][i] = max(min(Max[x][i - 1], Max[fa[x][i - 1]][i - 1]),
+			                 max(Tmax[x][i - 1], Tmax[fa[x][i - 1]][i - 1]));
+	}
+	for(int i = head[x]; ~ i; i = G[i].nxt)
+	{
+		int v = G[i].v;
+		if(v != f_)
+		{
+			fa[v][0] = x;
+			Max[v][0] = G[i].w;
+			Tmax[v][0] = -1;
+			Dfs(v, x, dep + 1);
+		}
+	}
+}
+
+int Lca(int x, int y)
+{
+	if(deep[x] < deep[y]) swap(x, y);
+	int k = deep[x] - deep[y];
+	for(int i = 0; i <=  17; i ++)
+		if(k >> i & 1) x = fa[x][i];
+	if(x == y) return x;
+	for(int i = 17; i >= 0; i --)
+		if(fa[x][i] != fa[y][i]) x = fa[x][i], y = fa[y][i];
+	return fa[x][0];
+}
+
+void Work(int s, int t, int w_)
+{
+	int m1 = 0, m2 = 0, k = deep[s] - deep[t];
+	for(int i = 0; i <= 17; i ++)
+	{
+		if(k >> i & 1)
+		{
+			m2 = max(m2, Tmax[s][i]);
+			if(Max[s][i] > m1)
+			{
+				m2 = max(m2, m1);
+				m1 = Max[s][i];
+			}
+		}
+	}
+	if(m1 == w_) Min = min(Min, w_ - m2);
+	else Min = min(Min, w_ - m1);
+}
+
+int main()
+{
+	n = in();
+	m = in();
+	for(int i = 1; i <= n; i ++) head[i] = -1, father[i] = i;
+	Mi[0] = 1;
+	for(int i = 1; i <= 17; i ++) Mi[i] = Mi[i - 1] * 2;
+	for(int i = 1; i <= m; i ++)
+	{
+		E[i].u = in(), E[i].v = in(), E[i].w = in();
+	}
+	sort(E + 1, E + m + 1);
+	Mst();
+	Dfs(1, 0, 1);
+	for(int i = 1; i <= m; i ++)
+	{
+		if(!E[i].is_in)
+		{
+			int u = E[i].u, v = E[i].v;
+			int L = Lca(u, v);
+			Work(u, L, E[i].w);
+			Work(v, L, E[i].w);
+		}
+	}
+	cout << Answer + Min;
+}
+```
+##### 4.3.3 曼哈顿最小生成树
+```
+//O(nlogn) 
+//求曼哈顿最小生成树上第 k 大的边 
+const int MAXN = 100010;
+const int INF = 0x3f3f3f3f;
+struct Point
+{
+	int x,y,id;
+} p[MAXN];
+bool cmp(Point a,Point b)
+{
+	if(a.x != b.x) return a.x < b.x;
+	else return a.y < b.y;
+}
+//树状数组，找 y-x 大于当前的，但是 y+x 最小的
+struct BIT
+{
+	int min_val,pos;
+	void init()
+	{
+		min_val = INF;
+		pos = -1;
+	}
+} bit[MAXN];
+//所有有效边
+struct Edge
+{
+	int u,v,d;
+} edge[MAXN<<2];
+bool cmpedge(Edge a,Edge b)
+{
+	return a.d < b.d;
+}
+int tot;
+int n;
+int F[MAXN];
+int find(int x)
+{
+	if(F[x] == -1) return x;
+	else return F[x] = find(F[x]);
+}
+void addedge(int u,int v,int d)
+{
+	edge[tot].u = u;
+	edge[tot].v = v;
+	edge[tot++].d = d;
+}
+int lowbit(int x)
+{
+	return x&(-x);
+}
+void update(int i,int val,int pos)
+{
+	while(i > 0)
+	{
+		if(val < bit[i].min_val)
+		{
+			bit[i].min_val = val;
+			bit[i].pos = pos;
+		}
+		i -= lowbit(i);
+	}
+}
+//查询 [i,m] 的最小值位置
+int ask(int i,int m)
+{
+	int min_val = INF,pos = -1;
+	while(i <= m)
+	{
+		if(bit[i].min_val < min_val)
+		{
+			min_val = bit[i].min_val;
+			pos = bit[i].pos;
+		}
+		i += lowbit(i);
+	}
+	return pos;
+}
+int dist(Point a,Point b)
+{
+	return abs(a.x - b.x) + abs(a.y - b.y);
+}
+void Manhattan_minimum_spanning_tree(int n,Point p[])
+{
+	int a[MAXN],b[MAXN];
+	tot = 0;
+	for(int dir = 0; dir < 4; dir++)
+	{
+		//4 种坐标变换
+		if(dir == 1 || dir == 3)
+		{
+			for(int i = 0; i < n; i++)
+				swap(p[i].x,p[i].y);
+		}
+		else if(dir == 2)
+		{
+			for(int i = 0; i < n; i++)
+				p[i].x = -p[i].x;
+		}
+		sort(p,p+n,cmp);
+		for(int i = 0; i < n; i++)
+			a[i] = b[i] = p[i].y - p[i].x;
+		sort(b,b+n);
+		int m = unique(b,b+n) - b;
+		for(int i = 1; i <= m; i++)
+			bit[i].init();
+		for(int i = n-1 ; i >= 0; i--)
+		{
+			int pos = lower_bound(b,b+m,a[i]) - b + 1;
+			int ans = ask(pos,m);
+			if(ans != -1)
+				addedge(p[i].id,p[ans].id,dist(p[i],p[ans]));
+			update(pos,p[i].x+p[i].y,i);
+		}
+	}
+}
+int solve(int k)
+{
+	Manhattan_minimum_spanning_tree(n,p);
+	memset(F,-1,sizeof(F));
+	sort(edge,edge+tot,cmpedge);
+	for(int i = 0; i < tot; i++)
+	{
+		int u = edge[i].u;
+		int v = edge[i].v;
+		int t1 = find(u), t2 = find(v);
+		if(t1 != t2)
+		{
+			F[t1] = t2;
+			k--;
+			if(k == 0)return edge[i].d;
+		}
+	}
+}
+int main()
+{
+	int k;
+	while(scanf("%d%d",&n,&k)==2 && n)
+	{
+		for(int i = 0; i < n; i++)
+		{
+			scanf("%d%d",&p[i].x,&p[i].y);
+			p[i].id = i;
+		}
+		printf("%d\n",solve(n-k));
+	}
+}
+```
+### 4.4 Kruskal重构树
+```
+//O(nlogn) 
+/*
+首先对边排序 
+然后使用并查集辅助加边，每新建一条边时： 
+新建节点index（编号从n+1开始） 
+将原有两节点所在集合改为index
+将原有节点与index连边 
+新建节点的权值为当前边的边权 
+*/ 
+void Ex_Kruskal(){
+    int ind=n,lim=n<<1; sort(e+1,e+1+m);
+    for(int i=1;i<=lim;++i) f[i]=i;
+    for(int i=1;i<=m;++i) {
+        int fx=getfa(e[i].a),fy=getfa(e[i].b);
+        if(fx!=fy) {
+            f[fx]=f[fy]=++ind;
+            val[ind]=e[i].w;
+            add(ind,fx); add(ind,fy);
+            if(ind==lim-1) break;
+        }
+    } return ;
+}
+```
+### 4.5 生成树计数
+```
+//O(n^3)
+/*
+Matrix-Tree 定理
+1、G 的度数矩阵 D[G] 是一个 n*n 的矩阵，并且满足：
+	当 i != j 时,d_ij=0；当 i=j 时，d_ij 等于vi 的度数。
+2、G 的邻接矩阵 A[G] 也是一个 n*n 的矩阵，并且满足：
+	如果 vi、vj 之间有边直接相连，则 aij=1，否则为 0。
+G 的 Kirchhoff 矩阵 C[G] 为 C[G]=D[G]-A[G]
+MatrixTree定理可以描述为：
+G 的所有不同的生成树的个数等于其 Kirchhoff 矩阵 C[G] 任何一个 n-1 阶主子式的行列式的
+绝对值。
+n-1 阶主子式就是对于 r(1<=r<=n)，将 C[G] 的第 r 行、第 r 列同时去掉后得到的新矩阵
+*/
+const int MOD=10007;
+ll pm(ll a,ll b,ll m)
+{
+	ll re=1;
+	while(b)
+	{
+		if(b&1)re=re*a%m;
+		a=a*a%m;b>>=1;
+	}
+	return re;
+}
+ll inv(ll a,ll m){return pm(a,m-2,m);}
+//inv(a)==inv(mod%a)*(mod-mod/a)%mod
+struct Matrix{	//0 base
+	int mat[330][330];
+	void init()
+	{
+		memset(mat,0,sizeof(mat));
+	}
+	int det(int n)
+	{
+		for(int i=0;i<n;i++)
+			for(int j=0;j<n;j++)
+				mat[i][j]=(mat[i][j]%MOD+MOD)%MOD;
+		int res=1;
+		for(int i=0;i<n;i++)
+		{
+			for(int j=i;j<n;j++)
+				if(mat[j][i]!=0)
+				{
+					for(int k=i;k<n;k++)
+						swap(mat[i][k],mat[j][k]);
+					if(i!=j)
+						res=(-res+MOD)%MOD;
+					break;
+				}
+			if(mat[i][i]==0){res=0;break;}
+			for(int j=i+1;j<n;j++)
+			{
+				int mut=(mat[j][i]*inv(mat[i][i],MOD))%MOD;
+				for(int k=i;k<n;k++)
+					mat[j][k]=(mat[j][k]-(mat[i][k]*mut)%MOD+MOD)%MOD;
+			}
+			res=(res*mat[i][i])%MOD;
+		}
+		return res;
+	}
+};
+int n,m;
+int g[330][330];
+int main()
+{
+	scanf("%d%d",&n,&m);
+	for(int i=1;i<=m;++i)
+	{
+		int x,y;
+		scanf("%d%d",&x,&y);
+		g[x][y]=g[y][x]=1;
+	}
+	Matrix ret;
+	ret.init();
+	for(int i=0;i<n;i++)
+		for(int j=0;j<n;j++)
+			if(i!=j&&g[i][j])
+			{
+				ret.mat[i][j]=-1;
+				ret.mat[i][i]++;
+			}
+	printf("%d\n",ret.det(n-1));	
+}
+```
+### 4.6 最小树形图
+```
+//O(nm)
+const int N=106,M=10006,inf=2e8;
+int n,m,rt,t,cnt=0,id[N],pre[N],ine[N],vis[N];
+struct line{
+	int x,y,c;
+} q[M];
+int zl()
+{
+	int ans=0;
+	while(1)
+	{
+		cnt=0;
+		for(int i=1; i<=n; ++i) 
+			ine[i]=inf,vis[i]=0,id[i]=0; //预处理
+		for(int i=1; i<=m; ++i) 
+			if(q[i].x!=q[i].y&&ine[q[i].y]>q[i].c) 
+				ine[q[i].y]=q[i].c,pre[q[i].y]=q[i].x; //每个点的最短边
+		for(int i=1; i<=n; ++i) 
+			if(i!=rt&&ine[i]==inf) 
+				return -1; //有点无最短边
+		for(int i=1; i<=n; ++i)
+		{
+			if(i==rt) continue;
+			ans+=ine[i],t=i;
+			while(vis[t]!=i&&!id[t]&&t!=rt) vis[t]=i,t=pre[t];
+			//能走到环的点或者换上的点停下
+			if(!id[t]&&t!=rt)
+			{
+				id[t]=++cnt; //将环上的点标记为新的环
+				for(int o=pre[t]; o!=t; o=pre[o]) id[o]=cnt;
+			}
+		}//找环
+		if(!cnt) break;//无环结束
+		for(int i=1; i<=n; ++i) if(!id[i]) id[i]=++cnt;
+		for(int i=1; i<=m; ++i)
+		{
+			t=q[i].y,q[i].x=id[q[i].x],q[i].y=id[q[i].y];
+			if(q[i].x!=q[i].y) q[i].c-=ine[t];
+		}
+		n=cnt,rt=id[rt];
+		//去旧图,换新图
+	}
+	return ans;
+}
+int main()
+{
+	n=in(),m=in(),rt=in();
+	for(int i=1; i<=m; ++i) q[i].x=in(),q[i].y=in(),q[i].c=in();
+	printf("%d\n",zl());
+}
+```
+### 4.7 Tarjan
+##### 4.7.1 有向图强连通分量
+```
+//O(n+m)
+const int N=1010;
+const int M=1000100;
+struct edge{
+	int to,nxt;
+}e[M];
+int hd[N],ptr;
+int low[N],dfn[N],st[N],bel[N];
+int ti,tp;
+int scc;
+bool ins[N];
+vector<int>vec[N];//每个强连通分量包含的点 
+bool z[1002][1002];
+void addedge(int u,int v)
+{
+	e[ptr].to=v;
+	e[ptr].nxt=hd[u];
+	hd[u]=ptr++;
+}
+void tarjan(int u)
+{
+	int v;
+	low[u]=dfn[u]=++ti;
+	st[tp++]=u;
+	ins[u]=1;
+	for(int i=hd[u];i!=-1;i=e[i].nxt)
+	{
+		v=e[i].to;
+		if(!dfn[v])
+		{
+			tarjan(v);
+			if(low[u]>low[v])low[u]=low[v];
+		}
+		else if(ins[v]&&low[u]>dfn[v])
+		{
+			low[u]=dfn[v];
+		}
+	}
+	if(low[u]==dfn[u])
+	{
+		scc++;
+		do{
+			v=st[--tp];
+			ins[v]=0;
+			bel[v]=scc;
+			vec[scc].push_back(v);
+		}while(v!=u);
+	}
+}
+int n,m;
+int main()
+{
+	ptr=ti=scc=tp=0;
+	memset(hd,-1,sizeof hd);
+	memset(dfn,0,sizeof dfn);
+	memset(ins,0,sizeof ins);
+	 
+	scanf("%d%d",&n,&m);
+	for(int i=1;i<=n;++i)vec[i].clear();
+	for(int x,y,i=1;i<=m;++i)
+	{
+		scanf("%d%d",&x,&y);
+		addedge(x,y);
+	}
+	for(int i=1;i<=n;++i)
+		if(!dfn[i])tarjan(i);
+	printf("%d\n",scc);
+}
+```
+##### 4.7.2 无向图割点+桥
+```
+//O(n+m)
+int n,m,tot,x,y,ti,root,cutid,cutedge;
+int dfn[50005],low[50005],cut[50005],instack[50005];
+int hd[50005],nxt[400005],to[400005];
+void tarjan(int k,int pre)
+{
+    dfn[k]=low[k]=++ti;
+    instack[k]=1;
+    int ok=0,son=0;
+    for(int i=hd[k];i!=-1;i=nxt[i]) 
+    {
+        if(to[i]==pre&&ok==0) 
+        {
+            ok=1;
+            continue;
+        }
+        if(dfn[to[i]]==0) 
+        {
+            son++;
+            tarjan(to[i],k);
+            if(low[to[i]]>dfn[k]) cutedge++; //桥 
+            if(low[to[i]]>=dfn[k]) cut[k]=1; //是不是割点 
+            low[k]=min(low[k],low[to[i]]);
+        }
+        else
+        if(instack[to[i]]) low[k]=min(low[k],dfn[to[i]]);
+    }
+    if(k==root)  //根要特判 
+    {
+        if(son>1) cut[k]=1; else cut[k]=0;
+    }
+    instack[k]=0;
+}
+void add(int x,int y)
+{
+    tot++; nxt[tot]=hd[x];
+    to[tot]=y; hd[x]=tot;
+}
+int main()
+{
+    scanf("%d%d",&n,&m);
+    for(int i=1;i<=n;i++) hd[i]=-1;
+    for(int i=1;i<=m;i++) 
+    {
+        scanf("%d%d",&x,&y);
+        add(x,y);add(y,x);
+    }
+    for(int i=1;i<=n;i++) 
+    if(dfn[i]==0) 
+    {
+        root=i;
+        tarjan(i,-1);
+    }
+    for(int i=1;i<=n;i++) 
+    if(cut[i]) cutid++;
+    printf("%d %d\n",cutid,cutedge);
+}
+```
+### 4.8 支配树
+```
+//O((n+m)logn)
+//给定一张有向图，求从1号点出发，每个点能支配的点的个数
+const int N=2e5+5;
+int n,m;
+struct node
+{
+    vector<int>edge[N];
+    inline void add(int u,int v){edge[u].push_back(v);}
+}a,b,c,d;
+int dfn[N],id[N],fa[N],cnt;
+void dfs(int u)
+{
+    dfn[u]=++cnt;id[cnt]=u;
+    int len=a.edge[u].size();
+    for(int i=0;i<len;++i)
+    {
+        int v=a.edge[u][i];
+        if(dfn[v])continue;
+        fa[v]=u;dfs(v);
+    }
+}
+int semi[N],idom[N],bel[N],val[N];
+inline int find(int x)
+{
+    if(x==bel[x])return x;
+    int tmp=find(bel[x]);
+    if(dfn[semi[val[bel[x]]]]<dfn[semi[val[x]]]) val[x]=val[bel[x]];
+    return bel[x]=tmp;
+}
+inline void tarjan()
+{
+    for(int i=cnt;i>1;--i)
+    {
+        int u=id[i],len=b.edge[u].size();
+        for(int i=0;i<len;++i)
+        {
+            int v=b.edge[u][i];
+            if(!dfn[v])continue;
+            find(v);
+            if(dfn[semi[val[v]]]<dfn[semi[u]]) semi[u]=semi[val[v]];
+        }
+        c.add(semi[u],u);
+        bel[u]=fa[u];
+        u=fa[u];
+        len=c.edge[u].size();
+        for(int i=0;i<len;++i)
+        {
+            int v=c.edge[u][i];
+            find(v);
+            if(semi[val[v]]==u)idom[v]=u;
+            else idom[v]=val[v];
+        }
+    }
+    for(int i=2;i<=cnt;++i)
+    {
+        int u=id[i];
+        if(idom[u]!=semi[u]) idom[u]=idom[idom[u]];
+    }
+}
+int ans[N];
+void dfs_ans(int u)
+{
+    ans[u]=1;
+    int len=d.edge[u].size();
+    for(int i=0;i<len;++i)
+    {
+        int v=d.edge[u][i];
+        dfs_ans(v);
+        ans[u]+=ans[v];
+    }
+}
+int main()
+{
+    n=in(),m=in();
+    for(int i=1;i<=m;++i)
+    {
+        int u=in(),v=in();
+        a.add(u,v);
+        b.add(v,u);
+    }
+    for(int i=1;i<=n;++i) semi[i]=bel[i]=val[i]=i;
+    dfs(1);
+    tarjan();
+    for(int i=2;i<=n;++i) d.add(idom[i],i);
+    dfs_ans(1);
+    for(int i=1;i<=n;++i)printf("%d ",ans[i]);
+}
+```
+### 4.9 二分图匹配
+##### 4.9.1 匈牙利
+```
+//O(n*m)
+const int N=2005;
+int n,m,e,ti;
+int mat[N],vis[N];
+vector<int>v[N];
+bool _find(int c)
+{
+	for(int i=0;i<v[c].size();++i)
+	if(vis[v[c][i]]!=ti)
+	{
+		vis[v[c][i]]=ti;
+		if(!mat[v[c][i]]||_find(mat[v[c][i]]))
+		{
+			mat[v[c][i]]=c;
+			return 1;
+		}
+	}
+	return 0;
+}
+int main()
+{
+	memset(mat,0,sizeof mat);
+	n=in();m=in();e=in(); 
+	for(int i=1;i<=e;++i)
+	{
+		int x=in(),y=in();
+		if(x<=n&&y<=m)v[x].push_back(n+y);
+	}
+	int cnt=0;
+	for(int i=1;i<=n;++i)
+	{
+		++ti;
+		if(_find(i))++cnt;
+	}
+	printf("%d",cnt);
+}
+```
+##### 4.9.2 Hopcroft-Karp
+```
+O(sqrt(n)*m)
+namespace Hopcroft
+{
+	const int N=5010,M=1000010;//最大的单侧点个数
+	int cnt,pos[N],neg[N];//pos[]为左侧点所匹配到的右侧点编号，从0开始
+	//neg[]反之，没有匹配到对应的点则为-1
+	//传入左侧点个数 n 和左侧点至右侧点的边表e[]，返回匹配点对的数量cnt
+	int lx[N],ly[N],q[N],n,g[N],v[M],nxt[M],ed;
+	void init(int _n)
+	{
+		n=_n;
+		for(int i=ed=0; i<n; i++)g[i]=0;
+	}
+	void add(int x,int y)
+	{
+		v[++ed]=y;
+		nxt[ed]=g[x];
+		g[x]=ed;
+	}
+	bool dfs(int x)
+	{
+		int c=lx[x]+1,y=lx[x]=-1;
+		for(int i=g[x]; i; i=nxt[i])if(ly[y=v[i]]==c)
+		{
+			ly[y]=-1;
+			if(~neg[y]&&!dfs(neg[y]))continue;
+			pos[neg[y]=x]=y;
+			return 1;
+		}
+		return 0;
+	}
+	int work()
+	{
+		int i,x,y;
+		fill(pos,pos+n,-1);
+		fill(neg,neg+n,-1);
+		for(x=cnt=0; x<n; x++)for(i=g[x]; i; i=nxt[i])
+		{
+			if(~neg[y=v[i]])continue;
+			pos[neg[y]=x]=y;
+			cnt++;
+			break;
+		}
+		while(1)
+		{
+			int h=0,t=0,ok=0;
+			fill(lx,lx+n,-1),fill(ly,ly+n,-1);
+			for(x=0; x<n; x++)if(pos[x]<0)lx[q[t++]=x]=0;
+			while(h!=t)
+			{
+				for(i=g[x=q[h++]]; i; i=nxt[i])
+				{
+					if(~ly[y=v[i]])continue;
+					ly[y]=1+lx[x];
+					if(~neg[y]&&~lx[neg[y]])continue;
+					if(~neg[y])lx[q[t++]=neg[y]]=1+ly[y];
+					else ok=1;
+				}
+			}
+			if(!ok)return cnt;
+			for(x=0; x<n; x++)if(pos[x]<0&&dfs(x))cnt++;
+		}
+	}
+}
+int n,m,e;
+int main()
+{
+	n=in();m=in();e=in();
+	Hopcroft::init(n+m+1);
+	for(int i=1;i<=e;++i)
+	{
+		int x=in(),y=in();
+		if(x<=n&&y<=m)Hopcroft::add(x,n+y);
+	}
+	printf("%d",Hopcroft::work());
+}
+```
+##### 4.9.3 二分图最大权匹配（Kuhn-Munkres）
+```
+//O(n^3)
+/*
+左边 nl 个点 1..nl，右边 nr 个点 1..nr，两点间代价为 add(x, y, z) 表示左 x，右 y。
+最后输出 ans 为最大费用最大流，lk[i] 表示左边第 i 个点匹配右边哪个，0 表示不匹配。
+最大费用流时，NOT=0；最大费用最大流时，NOT=-1LL*N*M。
+*/
+const int N=405,M=1000000010;
+const ll NOT=0,INF=3LL*N*M;
+int n,nl,nr,m,z,py,x,y,i,j,p,lk[N],pre[N];
+bool vy[N];
+ll lx[N],ly[N],d,w[N][N],slk[N],ans;
+void add(int x,int y,ll z)
+{
+	if(w[y][x]<z)w[y][x]=z;
+}
+int main()
+{
+	scanf("%d%d%d",&nl,&nr,&m);
+	n=max(nl,nr);
+	for(i=0; i<=n; i++)lk[i]=pre[i]=lx[i]=ly[i]=slk[i]=0;
+	for(i=0; i<=n; i++)for(j=0; j<=n; j++)w[i][j]=NOT;
+	while(m--)scanf("%d%d%d",&x,&y,&z),add(x,y,z);
+	for(i=1; i<=n; i++)for(j=1; j<=n; j++)lx[i]=max(lx[i],w[i][j]);
+	for(i=1; i<=n; i++)
+	{
+		for(j=1; j<=n; j++)slk[j]=INF,vy[j]=0;
+		for(lk[py=0]=i; lk[py]; py=p)
+		{
+			vy[py]=1;
+			d=INF;
+			x=lk[py];
+			for(y=1; y<=n; y++)if(!vy[y])
+			{
+				if(lx[x]+ly[y]-w[x][y]<slk[y])slk[y]=lx[x]+ly[y]-w[x][y],pre[y]=py;
+				if(slk[y]<d)d=slk[y],p=y;
+			}
+			for(y=0; y<=n; y++)if(vy[y])lx[lk[y]]-=d,ly[y]+=d;
+				else slk[y]-=d;
+		}
+		for(; py; py=pre[py])lk[py]=lk[pre[py]];
+	}
+	for(ans=0,i=1; i<=n; i++)
+	{
+		ans+=lx[i]+ly[i];
+		if(w[lk[i]][i]==NOT)ans-=NOT;
+	}
+	printf("%lld\n",ans);
+	for(i=1; i<=nl; i++)printf("%d ",w[lk[i]][i]!=NOT?lk[i]:0);
+}
+```
+##### 4.9.4 二分图关键点／边判定
+```
+/*
+最简单的思路就是枚举所有边，
+如果去掉一条边之后发现最大匹配数目减少了，
+则说明这条边所对应的点就是关键点。
+
+其次还有一种复杂度更低的思路，就是对于每个已经匹配过的边，
+先删除这条边，我们以所有没有匹配过的顶点为起点再去匹配边，
+如果发现可以匹配到那么就说明还可以找到其他增广路，
+意思就是可以有别的匹配边代替这条匹配边，那么这个点就不是关键点，
+否则这个点就是关键点。
+
+const int maxn = 100 + 5, maxm = 100 * 100 + 5;
+int linker[maxn], ui[maxn], vi[maxn];
+bool used[maxn], g[maxn][maxn];
+int n, m;
+
+bool dfs(int u) {
+    for(int v = 1; v <= m; v ++) {
+        if(g[u][v] && !used[v]) {
+            used[v] = true;
+            if(linker[v] == -1 || dfs(linker[v])) {
+                linker[v] = u;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int hungary() {
+    int res = 0;
+    memset(linker, -1, sizeof linker);
+    for(int i = 1; i <= n; i ++) {
+        memset(used, false, sizeof used);
+        if(dfs(i)) res ++;
+    }
+    return res;
+}
+
+int main() {
+    int k, u, v, Case = 0;
+    while(~scanf("%d %d %d", &n, &m, &k)) {
+        memset(g, false, sizeof g);
+        for(int i = 0; i < k; i ++) {
+            scanf("%d %d", &ui[i], &vi[i]);
+            g[ui[i]][vi[i]] = true;
+        }
+        int res1 = hungary(), cnt = 0;
+        for(int i = 0; i < k; i ++) {
+            g[ui[i]][vi[i]] = false;
+            int res2 = hungary();
+            if(res2 < res1) cnt ++;
+            g[ui[i]][vi[i]] = true;
+        }
+        printf("Board %d have %d important blanks for %d chessmen.\n", ++ Case, cnt, res1);
+    }
+    return 0;
+}
+*/
+
+const int maxn = 100 + 5;
+int n, m, k;
+int linkery[maxn], linkerx[maxn];
+bool used[maxn], g[maxn][maxn];
+bool flag;
+
+bool dfs(int u) {
+    for(int v = 1; v <= m; v ++) {
+        if(g[u][v] && !used[v]) {
+            used[v] = true;
+            if(linkery[v] == -1 || dfs(linkery[v])) {
+                if(flag) {
+                    linkery[v] = u;
+                    linkerx[u] = v;
+                }
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int hungary() {
+    flag = true;
+    memset(linkery, -1, sizeof linkery);
+    memset(linkerx, -1, sizeof linkerx);
+    int res = 0;
+    for(int i = 1; i <= n; i ++) {
+        memset(used, false, sizeof used);
+        if(dfs(i)) res ++;
+    }
+    return res;
+}
+
+bool can() {
+    flag = false;
+    for(int u = 1; u <= n; u ++) {
+        if(linkerx[u] == -1) {
+            memset(used, false, sizeof used);
+            if(dfs(u)) return true;
+        }
+    }
+    return false;
+}
+
+int main() {
+    int u, v, Case = 0;
+    while(~scanf("%d %d %d", &n, &m, &k)) {
+        memset(g, false, sizeof g);
+        for(int i = 0; i < k; i ++) {
+            scanf("%d %d", &u, &v);
+            g[u][v] = true;
+        }
+        int ans = hungary();
+        int res = 0, temp;
+        for(int i = 1; i <= n; i ++) {
+            if(~linkerx[i]) {
+                temp = linkerx[i];
+                linkerx[i] = linkery[temp] = -1;
+                g[i][temp] = false;
+                if(!can()) res ++;
+                linkerx[i] = temp;
+                linkery[temp] = i;
+                g[i][temp] = true;
+            }
+        }
+        printf("Board %d have %d important blanks for %d chessmen.\n", ++ Case, res, ans);
+    }
+    return 0;
+}
+```
+### 4.10 一般图匹配
+##### 4.10.1 带花树
+```
+//O(nm)
+struct da{
+	int x,y;
+}d[100010];
+int ecnt;
+int n,m;
+namespace F{
+	const int MAXN = 15010;
+	int N;
+	vector<int> Graph[MAXN];
+	int Match[MAXN];
+	bool InQueue[MAXN],InPath[MAXN],InBlossom[MAXN];
+	int Head,Tail;
+	int Queue[MAXN];
+	int Start,Finish;
+	int NewBase;
+	int Father[MAXN],Base[MAXN];
+	int Count;
+	void CreateGraph() {
+		int u,v;
+		for(int i=1;i<=ecnt;++i)
+		{
+			u=d[i].x,v=d[i].y;
+			Graph[u].push_back(v);
+			Graph[v].push_back(u);
+		}
+	}
+	void Push(int u) {
+		Queue[Tail] = u;
+		Tail++;
+		InQueue[u] = true;
+	}
+	int Pop() {
+		int res = Queue[Head];
+		Head++;
+		return res;
+	}
+	int FindCommonAncestor(int u,int v) {
+		memset(InPath,false,sizeof(InPath));
+		while(true) {
+			u = Base[u];
+			InPath[u] = true;
+			if(u == Start) break;
+			u = Father[Match[u]];
+		}
+		while(true) {
+			v = Base[v];
+			if(InPath[v])break;
+			v = Father[Match[v]];
+		}
+		return v;
+	}
+	void ResetTrace(int u) {
+		int v;
+		while(Base[u] != NewBase) {
+			v = Match[u];
+			InBlossom[Base[u]] = InBlossom[Base[v]] = true;
+			u = Father[v];
+			if(Base[u] != NewBase) Father[u] = v;
+		}
+	}
+	void BloosomContract(int u,int v) {
+		NewBase = FindCommonAncestor(u,v);
+		memset(InBlossom,false,sizeof(InBlossom));
+		ResetTrace(u);
+		ResetTrace(v);
+		if(Base[u] != NewBase) Father[u] = v;
+		if(Base[v] != NewBase) Father[v] = u;
+		for(int tu = 1; tu <= N; tu++)
+			if(InBlossom[Base[tu]]) {
+				Base[tu] = NewBase;
+				if(!InQueue[tu]) Push(tu);
+			}
+	}
+	void FindAugmentingPath() {
+		memset(InQueue,false,sizeof(InQueue));
+		memset(Father,0,sizeof(Father));
+		for(int i = 1; i <= N; i++)
+			Base[i] = i;
+		Head = Tail = 1;
+		Push(Start);
+		Finish = 0;
+		while(Head < Tail) {
+			int u = Pop();
+			for(int i=0;i<Graph[u].size();++i)
+			{
+				int v=Graph[u][i];
+				if((Base[u] != Base[v]) && (Match[u] !=v)) {
+					if((v == Start) || ((Match[v] > 0) && Father[Match[v]] > 0))
+						BloosomContract(u,v);
+					else if(Father[v] == 0) {
+						Father[v] = u;
+						if(Match[v] > 0)
+							Push(Match[v]);
+						else {
+							Finish = v;
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
+	void AugmentPath() {
+		int u,v,w;
+		u = Finish;
+		while(u > 0) {
+			v = Father[u];
+			w = Match[v];
+			Match[v] = u;
+			Match[u] = v;
+			u = w;
+		}
+	}
+	void Edmonds() {
+		memset(Match,0,sizeof(Match));
+		for(int u = 1; u <= N; u++)
+			if(Match[u] == 0) {
+				Start = u;
+				FindAugmentingPath();
+				if(Finish > 0)AugmentPath();
+			}
+	}
+	void PrintMatch() {
+		Count = 0;
+		for(int u = 1; u <= N;u++)
+			if(Match[u] > 0)
+				Count++;
+		Count/=2;
+		printf("%d\n",Count);
+		for(int u = 1; u <= N; u++)
+			if(u < Match[u])
+				printf("%d-%d\n",u,Match[u]);
+	}
+	int solve() {
+		CreateGraph();
+		Edmonds();
+		PrintMatch();
+	}
+}
+void addedge(int x,int y)
+{
+	d[++ecnt]=(da){x,y};
+}
+int main()
+{
+	n=in();m=in();
+	for(int i=1;i<=m;++i)
+	{
+		int x=in(),y=in();
+		addedge(x,y);
+	}
+	F::N=n;
+	F::solve();
+}
+```
+##### 4.10.2 一般图最大权匹配
+```
+//一般图的最大加权匹配模板
+//注意 G 的初始化, 需要偶数个点，刚好可以形成 n/2 个匹配
+//如果要求最小权匹配，可以取相反数，或者稍加修改就可以了
+//点的编号从 0 开始的
+const int MAXN = 110;
+const int INF = 0x3f3f3f3f;
+int G[MAXN][MAXN];
+int cnt_node;//点的个数
+int dis[MAXN];
+int match[MAXN];
+bool vis[MAXN];
+int sta[MAXN],top;//堆栈
+bool dfs(int u)
+{
+	sta[top++] = u;
+	if(vis[u])return true;
+	vis[u] = true;
+	for(int i = 0; i < cnt_node; i++)
+		if(i != u && i != match[u] && !vis[i])
+		{
+			int t = match[i];
+			if(dis[t] < dis[u] + G[u][i] - G[i][t])
+			{
+				dis[t] = dis[u] + G[u][i] - G[i][t];
+				if(dfs(t))return true;
+			}
+		}
+	top--;
+	vis[u] = false;
+	return false;
+}
+int P[MAXN];
+//返回最大匹配权值
+int get_Match(int N)
+{
+	cnt_node = N;
+	for(int i = 0; i < cnt_node; i++)P[i] = i;
+	for(int i = 0; i < cnt_node; i += 2)
+	{
+		match[i] = i+1;
+		match[i+1] = i;
+	}
+	int cnt = 0;
+	while(1)
+	{
+		memset(dis,0,sizeof(dis));
+		memset(vis,false,sizeof(vis));
+		top = 0;
+		bool update = false;
+		for(int i = 0; i < cnt_node; i++)
+			if(dfs(P[i]))
+			{
+				update = true;
+				int tmp = match[sta[top-1]];
+				int j = top-2;
+				while(sta[j] != sta[top-1])
+				{
+					match[tmp] = sta[j];
+					swap(tmp,match[sta[j]]);
+					j--;
+				}
+				match[tmp] = sta[j];
+				match[sta[j]] = tmp;
+				break;
+			}
+		if(!update)
+		{
+			cnt++;
+			if(cnt >= 3)break;
+			random_shuffle(P,P+cnt_node);
+		}
+	}
+	int ans = 0;
+	for(int i = 0; i < cnt_node; i++)
+	{
+		int v = match[i];
+		if(i < v)ans += G[i][v];
+	}
+	return ans;
+}
+```
+### 4.11 网络流
+##### 4.11.1 最大流（dinic）
+```
+//O(n^2*m)
+const int N=10010;
+const int M=2000010;
+const ll inf=1e18;
+struct maxflow{
+	ll S,T,ptr;
+	struct edge{
+		ll to,flow,nxt;
+	}e[M];
+	ll hd[N],cur[N],dis[N];
+	void reset()
+	{
+		memset(hd,0,sizeof hd);
+		ptr=1;
+	}
+	maxflow(){reset();}
+	void addedge(ll x,ll y,ll fl)
+	{
+		e[++ptr]=(edge){y,fl,hd[x]};hd[x]=ptr;
+		e[++ptr]=(edge){x,0,hd[y]};hd[y]=ptr;
+	}
+	bool bfs()
+	{
+		memset(dis,0,sizeof dis);
+		queue<int>q;q.push(S);
+		dis[S]=1;
+		while(!q.empty())
+		{
+			int h=q.front();q.pop();
+			for(ll i=hd[h];i;i=e[i].nxt)
+			if(!dis[e[i].to]&&e[i].flow)
+			{
+				dis[e[i].to]=dis[h]+1;
+				q.push(e[i].to);
+			}
+		}
+		return dis[T];
+	}
+	ll dfs(ll c,ll fl)
+	{
+		if(c==T||!fl)return fl;
+		ll used=0,f;
+		for(ll&i=cur[c];i;i=e[i].nxt)
+		if(dis[e[i].to]==dis[c]+1&&e[i].flow)
+		{
+			f=dfs(e[i].to,min(e[i].flow,fl-used));
+			if(!f)continue;
+			used+=f;
+			e[i].flow-=f;e[i^1].flow+=f;
+			if(used==fl)return used;
+		}
+		if(used==0)dis[c]=-1;
+		return used;
+	}
+	ll dinic()
+	{
+		ll re=0;
+		while(bfs())memcpy(cur,hd,sizeof hd),re+=dfs(S,inf);
+		return re;
+	}
+}F;
+int n,m,s,t;
+int main()
+{
+	n=in();m=in();s=in();t=in();
+	F.S=s;F.T=t;
+	for(ll u,v,c,i=1;i<=m;++i)
+	{
+		u=in();v=in();c=in();
+		F.addedge(u,v,c);
+	}
+	printf("%lld\n",F.dinic());
+}
+```
+##### 4.11.2 费用流（spfa）
+```
+//O(F*kE)（F是流量)
+typedef pair<ll,ll>pii;
+const ll inf=1e18;
+const int N=5010;
+const int M=1000010;
+struct mcmf{
+	ll S,T,ptr;
+	struct edge{
+		ll to,nxt,flow,cost;
+	}e[M];
+	ll cur[N],hd[N],dis[N],dep[N];
+	ll ans,cost;
+	bool ex[N];
+	void reset()
+	{
+		memset(hd,0,sizeof hd);
+		ptr=1;
+	}
+	mcmf(){reset();}
+	void addedge(ll u,ll v,ll f,ll w)
+	{
+		e[++ptr]=(edge){v,hd[u],f,w};hd[u]=ptr;
+		e[++ptr]=(edge){u,hd[v],0,-w};hd[v]=ptr;
+	}
+	bool spfa()
+	{
+		memset(dis,127/3,sizeof dis);dis[S]=0;
+		memset(dep,-1,sizeof dep);dep[S]=0;
+		queue<int>q;
+		q.push(S);ex[S]=1;
+		while(!q.empty())
+		{
+			int h=q.front();q.pop();
+			for(int i=hd[h];i;i=e[i].nxt)
+			if(e[i].flow&&dis[e[i].to]>dis[h]+e[i].cost)
+			{
+				int to=e[i].to;
+				dis[to]=dis[h]+e[i].cost;
+				dep[to]=dep[h]+1;
+				if(!ex[to])ex[to]=1,q.push(to);
+			}
+			ex[h]=0;
+		}
+		return dis[T]!=dis[0];
+	}
+	ll dfs(ll c,ll fl)
+	{
+		if(!fl)return 0;
+		if(c==T)
+		{
+			ans+=fl;
+			cost+=dis[T]*fl;
+			return fl;
+		}
+		ll used=0,f;
+		for(ll&i=cur[c];i;i=e[i].nxt)
+		if(dis[e[i].to]==dis[c]+e[i].cost&&dep[e[i].to]==dep[c]+1&&e[i].flow)
+		{
+			f=dfs(e[i].to,min(e[i].flow,fl-used));
+			if(!f)continue;
+			used+=f;
+			e[i].flow-=f;e[i^1].flow+=f;
+			if(used==fl)return used;
+		}
+		if(used==0)dis[c]=-1;
+		return used;
+	}
+	pii solve()
+	{
+		ans=0,cost=0;
+		while(spfa())memcpy(cur,hd,sizeof hd),dfs(S,inf);
+		return make_pair(ans,cost);
+	}
+}F;
+int main()
+{
+	ll n=in(),m=in();F.S=in();F.T=in();
+	ll i,u,v,f,w;
+	for(i=1;i<=m;++i)
+		u=in(),v=in(),f=in(),w=in(),F.addedge(u,v,f,w);
+	pii tp=F.solve();
+	printf("%lld %lld",tp.first,tp.second);
+}
+```
+##### 4.11.3 费用流（dijkstra）
+```
+//O(F*ElogV)（F是流量)
+typedef pair<ll,ll>pii;
+const ll inf=1e9;
+namespace F{
+	const int maxn=200000;
+	typedef pair<int, int> pii;
+	struct edge {
+	    int to, cap, cost, rev;
+	    edge() {}
+	    edge(int to, int _cap, int _cost, int _rev):to(to), cap(_cap), cost(_cost), rev(_rev) {}
+	};
+	int V;         
+	int h[maxn];    
+	int dis[maxn]; 
+	int prevv[maxn];
+	int pree[maxn]; 
+	vector<edge> G[maxn];   
+	
+	void init(int n) {
+	    V = n;
+	    for(int i = 0; i <= V; ++i) G[i].clear();
+	}
+	void addedge(int from, int to, int cap, int cost){
+	    G[from].push_back(edge(to, cap, cost, G[to].size()));
+	    G[to].push_back(edge(from, 0, -cost, G[from].size() - 1));
+	}
+	pii solve(int s, int t, ll f, ll flow=0)
+	{  
+	    ll res = 0;
+	    for(int i = 0; i < 1 + V; i++) h[i] = 0;
+	    while(f){
+	        priority_queue<pii, vector<pii>, greater<pii> > q;
+	        for(int i = 0; i < 1 + V; i++) dis[i] = inf;
+	        dis[s] = 0; q.push(pii(0, s));
+	        while(!q.empty()) {
+	            pii now = q.top(); q.pop();
+	            int v = now.second;
+	            if(dis[v] < now.first) continue;
+	            for(int i = 0; i < G[v].size(); ++i) {
+	                edge &e = G[v][i];
+	                if(e.cap > 0 && dis[e.to] > dis[v] + e.cost + h[v] - h[e.to]){
+	                    dis[e.to] = dis[v] + e.cost + h[v] - h[e.to];
+	                    prevv[e.to] = v;
+	                    pree[e.to] = i;
+	                    q.push(pii(dis[e.to], e.to));
+	                }
+	            }
+	        }
+	        if(dis[t] == inf) break;
+	        for(int i = 0; i <= V; ++i) h[i] += dis[i];
+	        int d = f;
+	        for(int v = t; v != s; v = prevv[v]) d = min(d, G[prevv[v]][pree[v]].cap);
+	        f -= d; flow += d; res += d * h[t];
+	        for(int v = t; v != s; v = prevv[v]) {
+	            edge &e = G[prevv[v]][pree[v]];
+	            e.cap -= d;
+	            G[v][e.rev].cap += d;
+	        }
+	    }
+	    return make_pair(flow,res);
+	}
+}
+int main()
+{
+	int n=in(),m=in(),S=in(),T=in();
+	F::init(n+5);
+	for(int i=1;i<=m;++i)
+	{
+		int x=in(),y=in(),f=in(),c=in();
+		F::addedge(x,y,f,c);
+	}
+	pii res=F::solve(S,T,inf);
+	printf("%lld %lld\n",res.first,res.second);
+}
+```
+##### 4.11.4 全局最小割
+```
+//O(n^3)
+//给定一个无向图，两点之间可以有很多边连接(即有边权)，问至少去掉多少条边可以把图分成两个不相连的子图
+const int N = 510, INF = 0x3f3f3f3f;  
+int mpa[N][N], dis[N], v[N];//v数组是马甲数组，dis数组用来表示该点与A集合中所有点之间的边的长度之和  
+bool vis[N];//用来标记是否该点加入了A集合  
+int stoer_wagner(int n)  
+{  
+	int res = INF;  
+	for(int i = 0; i < n; i++) v[i] = i;//初始马甲为自己  
+	while(n > 1)  
+	{  
+		int k, pre = 0;//pre用来表示之前加入A集合的点，我们每次都以0点为第一个加入A集合的点  
+		memset(vis, 0, sizeof vis);  
+		memset(dis, 0, sizeof dis);
+		vis[v[pre]] = true;  ////
+		for(int i = 1; i < n; i++)  
+		{  
+			k = -1;  
+			for(int j = 1; j < n; j++)//根据之前加入的点，要更新dis数组，并找到最大的dis  
+				if(! vis[v[j]])  
+				{  
+					dis[v[j]] += mpa[v[pre]][v[j]];  
+					if(k == -1 || dis[v[k]] < dis[v[j]]) k = j;  
+				}  
+			vis[v[k]] = true;//标记该点已经加入A集合  
+			if(i == n - 1)//最后一次加入的点就要更新答案了  
+			{  
+				res = min(res, dis[v[k]]);  
+				for(int j = 0; j < n; j++)//将该点合并到pre上，相应的边权就要合并  
+				{  
+					mpa[v[pre]][v[j]] += mpa[v[j]][v[k]];  
+					mpa[v[j]][v[pre]] += mpa[v[j]][v[k]];  
+				}  
+				v[k] = v[--n];//删除点v[k]，把最后一个点扔到v[k]上  
+			}  
+			pre = k;  
+		}  
+	}  
+	return res;  
+}  
+int main()  
+{  
+	int n, m, a, b, c;  
+	while(~ scanf("%d%d", &n, &m))  
+	{  
+		memset(mpa, 0, sizeof mpa);  
+		for(int i = 0; i < m; i++)  
+		{  
+			scanf("%d%d%d", &a, &b, &c);  
+			mpa[a][b] += c, mpa[b][a] += c;// a、b 间加一条权值为 c 的边 
+		}  
+		printf("%d\n", stoer_wagner(n));  
+	}
+}
+```
+##### 4.11.5 最小割树
+```
+//O(n^3*m)
+/*
+构建最小割树的流程：
+1.集合中随便找两个点，求这两点的最小割
+2.用求出的最小割更新s，t两个集合之间点的最小割
+（或者可以直接建边，那么最终两点之间的最小割就是两点之间路径的最小权值
+3.对s,t两个集合递归处理
+*/
+#define INF 0x7fffffff
+using namespace std;
+const int N=510,M=14010;
+struct Edge{int to,capa,next;} e[N<<1];
+int h[N],sum=0,n,m,now=0;
+int pdx[N],tdx[N],col[N];
+int fa[9][N],mn[9][N],dep[N];
+
+void add_edge(int u,int v,int w)
+{
+    e[++sum].to=v;
+    e[sum].capa=w;
+    e[sum].next=h[u];
+    h[u]=sum;
+}
+
+namespace GHT
+{
+    struct Edge{int to,capa,flow,next;} e[M];
+    int h[N],sum=-1,s,t;
+    int d[N],cur[N];
+    bool vis[N];
+
+    void add_edge(int u,int v,int w)
+    {
+        e[++sum]={v,w,0,h[u]};h[u]=sum;
+        e[++sum]={u,w,0,h[v]};h[v]=sum;
+    }
+
+    bool BFS()
+    {
+        queue<int> q;q.push(s);
+        memset(vis,0,sizeof(vis));
+        vis[s]=1;d[s]=0;
+        while(!q.empty())
+        {
+            int u=q.front();q.pop();
+            for(int t=h[u];~t;t=e[t].next)
+            {
+                int v=e[t].to;
+                if(!vis[v]&&e[t].capa>e[t].flow)
+                {
+                    d[v]=d[u]+1;
+                    vis[v]=1;
+                    q.push(v);
+                }
+            }
+        }
+        return vis[t];
+    }
+
+    int DFS(int u,int a)
+    {
+        if(u==t||a==0) return a;
+        int res=0,flow;
+        for(int &t=cur[u];~t;t=e[t].next)
+        {
+            int v=e[t].to;
+            if(d[v]!=d[u]+1) continue;
+            flow=DFS(v,min(a,e[t].capa-e[t].flow));
+            if(!flow) continue;
+            e[t].flow+=flow;
+            e[t^1].flow-=flow;
+            res+=flow;a-=flow;
+            if(a==0) break;
+        }
+        return res;
+    }
+
+    int Dinic(int x,int y)
+    {
+        int flow=0;s=x;t=y;
+        for(int i=0;i<=sum;i++) e[i].flow=0;
+        while(BFS())
+        {
+            memcpy(cur,h,sizeof(h));
+            flow+=DFS(s,INF);
+        }
+        return flow;
+    }
+
+    void dfs(int u)
+    {
+        col[u]=now;
+        for(int t=h[u];~t;t=e[t].next)
+            if(e[t].capa>e[t].flow&&col[e[t].to]!=now)
+                dfs(e[t].to);
+    }
+
+    void build(int l,int r)
+    {
+        if(l>=r) return;
+        int x=pdx[l],y=pdx[l+1];
+        int cut=Dinic(x,y);
+        now++;dfs(x);int p=l,q=r;
+        for(int i=l;i<=r;i++)
+            if(col[pdx[i]]==now) tdx[p++]=pdx[i];
+            else tdx[q--]=pdx[i];
+        for(int i=l;i<=r;i++) pdx[i]=tdx[i];
+        ::add_edge(x,y,cut);
+        ::add_edge(y,x,cut);
+        build(l,p-1);build(q+1,r);
+    }
+}
+
+void dfs(int u,int la)
+{
+    for(int i=1;i<=8;i++)
+    {
+        fa[i][u]=fa[i-1][fa[i-1][u]];
+        mn[i][u]=min(mn[i-1][u],mn[i-1][fa[i-1][u]]);
+    }
+    for(int t=h[u];t;t=e[t].next)
+    {
+        int v=e[t].to;
+        if(v==la) continue;
+        dep[v]=dep[u]+1;
+        mn[0][v]=e[t].capa;
+        fa[0][v]=u;dfs(v,u);
+    }
+}
+
+int getcut(int x,int y)
+{
+    int res=INF;
+    if(dep[x]<dep[y]) swap(x,y);
+    for(int i=8;i>=0;i--)
+        if(dep[fa[i][x]]>=dep[y])
+        {
+            res=min(res,mn[i][x]);
+            x=fa[i][x];
+        }
+    if(x==y) return res;
+    for(int i=8;i>=0;i--)
+        if(fa[i][x]!=fa[i][y])
+        {
+            res=min(res,mn[i][x]);
+            res=min(res,mn[i][y]);
+            x=fa[i][x];y=fa[i][y];
+        }
+    res=min(res,min(mn[0][x],mn[0][y]));
+    return res;
+}
+
+int main()
+{
+    int u,v,w,q;
+    scanf("%d%d",&n,&m);
+    memset(GHT::h,-1,sizeof(GHT::h));
+    for(int i=1;i<=m;i++)
+    {
+        scanf("%d%d%d",&u,&v,&w);
+        GHT::add_edge(u,v,w);
+    }
+    for(int i=1;i<=n;i++) pdx[i]=i;
+    GHT::build(1,n);
+    dep[1]=1;dfs(1,0);
+    for(scanf("%d",&q);q;q--)
+    {
+        scanf("%d%d",&u,&v);
+        printf("%d\n",getcut(u,v));
+    }
+    return 0;
+}
+```
+### 4.12 最大团
+```
+const int maxn=55;
+int A[maxn][maxn],V[maxn];
+int n,cn,bestn;
+int check(int x)
+{
+    for(int i=1;i<x;++i)
+        if(V[i]&& !A[x][i])return 0;
+    return 1;
+}
+void dfs(int x)
+{
+    if(x>n)
+	{
+        bestn=max(cn,bestn);return;
+    }
+    if(check(x))
+	{
+        cn++;V[x]=1;dfs(x+1);cn--;
+    }
+    if(cn+n-x>bestn)
+	{
+        V[x]=0;dfs(x+1);
+    }
+}
+int main()
+{
+    while(1)
+	{
+		n=in();
+		if(!n)break;
+        for(int i=1;i<=n;++i)
+            for(int j=1;j<=n;++j) 
+				A[i][j]=in();
+        cn=bestn=0;
+        memset(V,0,sizeof V);
+        dfs(1);
+        printf("%d\n",bestn);
+    }
+}
+```
+### 4.13 2-SAT
+##### 4.13.1 任意解
+```
+//O(m)
+const int MAXN = 1010;
+const int MAXM = 100010;
+struct Edge
+{
+	int to,next;
+} edge[MAXM];
+int head[MAXN],tot;
+void init()
+{
+	tot = 0;
+	memset(head,-1,sizeof(head));
+}
+void addedge(int u,int v)
+{
+	edge[tot].to = v;
+	edge[tot].next = head[u];
+	head[u] = tot++;
+}
+int Low[MAXN],DFN[MAXN],Stack[MAXN],Belong[MAXN];//Belong 数组的值 1~scc 
+int Index,top;
+int scc;
+bool Instack[MAXN];
+int num[MAXN];
+void Tarjan(int u)
+{
+	int v;
+	Low[u] = DFN[u] = ++Index;
+	Stack[top++] = u;
+	Instack[u] = true;
+	for(int i = head[u]; i != -1; i = edge[i].next)
+	{
+		v = edge[i].to;
+		if( !DFN[v] )
+		{
+			Tarjan(v);
+			if(Low[u] > Low[v])Low[u] = Low[v];
+		}
+		else if(Instack[v] && Low[u] > DFN[v])
+			Low[u] = DFN[v];
+	}
+	if(Low[u] == DFN[u])
+	{
+		scc++;
+		do
+		{
+			v = Stack[--top];
+			Instack[v] = false;
+			Belong[v] = scc;
+			num[scc]++;
+		}
+		while(v != u);
+	}
+}
+bool solvable(int n)//n 是总个数, 需要选择一半
+{
+	memset(DFN,0,sizeof(DFN));
+	memset(Instack,false,sizeof(Instack));
+	memset(num,0,sizeof(num));
+	Index = scc = top = 0;
+	for(int i = 0; i < n; i++)
+		if(!DFN[i])
+			Tarjan(i);
+	for(int i = 0; i < n; i += 2)
+		{
+			if(Belong[i] == Belong[i^1])
+				return false;
+		}
+	return true;
+}
+//*************************************************
+//拓扑排序求任意一组解部分
+queue<int>q1,q2;
+vector<vector<int> > dag;//缩点后的逆向 DAG 图
+char color[MAXN];//染色，为'R' 是选择的
+int indeg[MAXN];//入度
+int cf[MAXN];
+void solve(int n)
+{
+	dag.assign(scc+1,vector<int>());
+	memset(indeg,0,sizeof(indeg));
+	memset(color,0,sizeof(color));
+	for(int u = 0; u < n; u++)
+		for(int i = head[u]; i != -1; i = edge[i].next)
+		{
+			int v = edge[i].to;
+			if(Belong[u] != Belong[v])
+			{
+				dag[Belong[v]].push_back(Belong[u]);
+				indeg[Belong[u]]++;
+			}
+		}
+	for(int i = 0; i < n; i += 2)
+	{
+		cf[Belong[i]] = Belong[i^1];
+		cf[Belong[i^1]] = Belong[i];
+	}
+	while(!q1.empty())q1.pop();
+	while(!q2.empty())q2.pop();
+	for(int i = 1; i <= scc; i++)
+		if(indeg[i] == 0)
+			q1.push(i);
+	while(!q1.empty())
+	{
+		int u = q1.front();
+		q1.pop();
+		if(color[u] == 0)
+		{
+			color[u] = 'R';
+			color[cf[u]] = 'B';
+		}
+		int sz = dag[u].size();
+		for(int i = 0; i < sz; i++)
+		{
+			indeg[dag[u][i]]--;
+			if(indeg[dag[u][i]] == 0)
+				q1.push(dag[u][i]);
+		}
+	}
+}
+int change(char s[])
+{
+	int ret = 0;
+	int i = 0;
+	while(s[i]>='0' && s[i]<='9')
+	{
+		ret *= 10;
+		ret += s[i]-'0';
+		i++;
+	}
+	if(s[i] == 'w')return 2*ret;
+	else return 2*ret+1;
+}
+int main()
+{
+	int n,m;
+	char s1[10],s2[10];
+	while(scanf("%d%d",&n,&m) == 2)
+	{
+		if(n == 0 && m == 0)break;
+		init();
+		while(m--)
+		{
+			scanf("%s%s",s1,s2);
+			int u = change(s1);
+			int v = change(s2);
+			addedge(u^1,v);
+			addedge(v^1,u);
+		}
+		addedge(1,0);
+		if(solvable(2*n))
+		{
+			solve(2*n);
+			for(int i = 1; i < n; i++)
+			{
+				//注意这一定是判断 color[Belong]
+				if(color[Belong[2*i]] == 'R')printf("%dw",i);
+				else printf("%dh",i);
+				if(i < n-1)printf(" ");
+				else printf("\n");
+			}
+		}
+		else printf("bad luck\n");
+	}
+	return 0;
+}
+```
+##### 4.13.2 字典序最小解
+```
+//O(nm)
+const int MAXN = 20020;
+const int MAXM = 100010;
+struct Edge
+{
+	int to,next;
+} edge[MAXM];
+int head[MAXN],tot;
+void init()
+{
+	tot = 0;
+	memset(head,-1,sizeof(head));
+}
+void addedge(int u,int v)
+{
+	edge[tot].to = v;
+	edge[tot].next = head[u];
+	head[u] = tot++;
+}
+bool vis[MAXN];//染色标记，为 true 表示选择
+int S[MAXN],top;//栈
+bool dfs(int u)
+{
+	if(vis[u^1])return 0;
+	if(vis[u])return 1;
+	vis[u] = 1;
+	S[top++] = u;
+	for(int i = head[u]; i != -1; i = edge[i].next)
+		if(!dfs(edge[i].to))
+			return 0;
+	return 1;
+}
+bool Twosat(int n)
+{
+	memset(vis,0,sizeof(vis));
+	for(int i = 0; i < n; i += 2)
+	{
+		if(vis[i] || vis[i^1])continue;
+		top = 0;
+		if(!dfs(i))
+		{
+			while(top)vis[S[--top]] = 0;
+			if(!dfs(i^1)) return 0;
+		}
+	}
+	return 1;
+}
+int main()
+{
+	int n,m;
+	int u,v;
+	while(scanf("%d%d",&n,&m) == 2)
+	{
+		init();
+		while(m--)
+		{
+			scanf("%d%d",&u,&v);
+			u--;
+			v--;
+			addedge(u,v^1);
+			addedge(v,u^1);
+		}
+		if(Twosat(2*n))
+		{
+			for(int i = 0; i < 2*n; i++)
+				if(vis[i])
+					printf("%d\n",i+1);
+		}
+		else printf("NIE\n");
+	}
+}
+```
+### 4.14 LCA
+##### 4.14.1 倍增
+```
+//O((n+q)logn)
+const int N=500010;
+vector<int>v[N];
+struct edge{
+	int to,nxt;
+}e[1000010];
+int hd[N],ptr;
+void addedge(int x,int y)
+{
+	e[++ptr]=(edge){y,hd[x]},hd[x]=ptr;
+}
+int n;
+int dfn[N],dep[N];
+int st[20][N];
+void dfs(int c,int f,int d)
+{
+	dfn[c]=++ptr;st[0][c]=f;dep[c]=d;
+	for(int i=0;i<v[c].size();++i)
+		if(v[c][i]!=f)dfs(v[c][i],c,d+1);
+}
+void _init()
+{
+	for(int i=1;i<20;++i)
+		for(int j=1;j<=n;++j)
+			st[i][j]=st[i-1][st[i-1][j]];
+}
+int lca(int x,int y)
+{
+	if(dep[x]<dep[y])swap(x,y);
+	for(int i=19;~i;--i)
+		if(dep[st[i][x]]>=dep[y])x=st[i][x];
+	for(int i=19;~i;--i)
+		if(st[i][x]!=st[i][y])x=st[i][x],y=st[i][y];
+	return x==y?x:st[0][x];
+}
+int main()
+{
+	int m,root;
+	n=in();m=in(),root=in();
+	for(int x,y,i=1;i<n;++i)
+	{
+		x=in();y=in();
+		v[x].push_back(y);
+		v[y].push_back(x);
+	}
+	dfs(root,0,1);
+	_init();
+	for(int x,y,i=1;i<=m;++i)
+	{
+		x=in();y=in();
+		printf("%d\n",lca(x,y));
+	}
+} 
+```
+##### 4.14.2 ST表
+```
+//O(nlogn+q)
+const int MAXN = 500010;
+int rmq[2*MAXN];//rmq 数组，就是欧拉序列对应的深度序列
+struct ST
+{
+	int mm[2*MAXN];
+	int dp[2*MAXN][20];//最小值对应的下标
+	void init(int n)
+	{
+		mm[0] = -1;
+		for(int i = 1; i <= n; i++)
+		{
+			mm[i] = ((i&(i-1)) == 0) ? mm[i-1]+1:mm[i-1];
+			dp[i][0] = i;
+		}
+		for(int j = 1; j <= mm[n]; j++)
+			for(int i = 1; i + (1<<j) - 1 <= n; i++)
+				dp[i][j] = rmq[dp[i][j-1]] < rmq[dp[i+(1<<(j-1))][j-1]] ? dp[i][j-1]:dp[i+(1<<(j-1))][j-1];
+	}
+	//查询 [a,b] 之间最小值的下标
+	int query(int a,int b)
+	{
+		if(a > b)swap(a,b);
+		int k = mm[b-a+1];
+		return rmq[dp[a][k]] <= rmq[dp[b-(1<<k)+1][k]] ? dp[a][k]:dp[b-(1<<k)+1][k];
+	}
+};
+struct Edge{
+	int to,next;
+};
+Edge edge[MAXN*2];
+int tot,head[MAXN];
+int F[MAXN*2];//欧拉序列，就是 dfs 遍历的顺序，长度为 2*n-1, 下标从 1 开始
+int P[MAXN];//P[i] 表示点 i 在 F 中第一次出现的位置
+int cnt;
+ST st;
+void addedge(int u,int v)
+{
+	edge[tot].to = v;
+	edge[tot].next = head[u];
+	head[u] = tot++;
+}
+void dfs(int u,int pre,int dep)
+{
+	F[++cnt] = u;
+	rmq[cnt] = dep;
+	P[u] = cnt;
+	for(int i = head[u]; i != -1; i = edge[i].next)
+	{
+		int v = edge[i].to;
+		if(v == pre)continue;
+		dfs(v,u,dep+1);
+		F[++cnt] = u;
+		rmq[cnt] = dep;
+	}
+}
+void LCA_init(int root,int node_num)
+{
+	cnt = 0;
+	dfs(root,root,0);
+	st.init(2*node_num-1);
+}
+int query_lca(int u,int v)
+{
+	return F[st.query(P[u],P[v])];
+}
+int n,q,root;
+int main()
+{
+	n=in();q=in();root=in();
+	tot=0;
+	memset(head,-1,sizeof head);
+	int u,v;
+	for(int i=1;i<n;i++)
+	{
+		u=in();v=in();
+		addedge(u,v);
+		addedge(v,u);
+	}
+	LCA_init(root,n);
+	for(int i=1;i<=q;++i)
+	{
+		u=in();v=in();
+		printf("%d\n",query_lca(u,v));
+	}
+}
+```
+##### 4.14.3 离线tarjan
+```
+//O(n+q)
+const int N = 5e5 + 7;
+int n, m, u, v, root;
+int tot = 0, st[N], to[N << 1], nx[N << 1], fa[N], ans[N], vis[N];
+struct note { int node, id; };
+vector<note> ques[N];
+
+void add(int u, int v) { to[++tot] = v, nx[tot] = st[u], st[u] = tot; }
+int getfa(int x) { return fa[x] == x ? x : fa[x] = getfa(fa[x]); }
+
+void dfs(int u, int from)
+{
+    for (int i = st[u]; i; i = nx[i]) if (to[i] != from) dfs(to[i], u), fa[to[i]] = u;
+    int len = ques[u].size();
+    for (int i = 0; i < len; i++) if (vis[ques[u][i].node]) ans[ques[u][i].id] = getfa(ques[u][i].node);
+    vis[u] = 1;
+}
+
+int main()
+{
+    n = in(), m = in(), root = in();
+    for (int i = 1; i < n; i++) u = in(), v = in(), add(u, v), add(v, u);
+    for (int i = 1; i <= m; i++) u = in(), v = in(), ques[u].push_back((note){v, i}), ques[v].push_back((note){u, i}); //记下询问编号便于输出
+    for (int i = 1; i <= n; i++) fa[i] = i;
+    dfs(root, 0);
+    for (int i = 1; i <= m; i++) printf("%d\n", ans[i]);
+}
+```
+### 4.15 欧拉回路
+##### 4.15.1 有向图
+```
+//O(n+m)
+/*
+给出 n 个小写字母组成的单词，要求将 n 个单词连接起来，
+使得前一个单词的最后一个字母和后一个单词的第一个字母相同。输出字典序最小的解。 
+把26个小写字母当成点，每个单词就是一条边。
+*/
+struct Edge{
+	int to,next;
+	int index;
+	bool flag;
+} edge[2010];
+int head[30],tot;
+void init()
+{
+	tot = 0;
+	memset(head,-1,sizeof(head));
+}
+void addedge(int u,int v,int index)
+{
+	edge[tot].to = v;
+	edge[tot].next = head[u];
+	edge[tot].index = index;
+	edge[tot].flag = false;
+	head[u] = tot++;
+}
+string str[1010];
+int in[30],out[30];
+int cnt;
+int ans[1010];
+void dfs(int u)
+{
+	for(int i = head[u] ; i != -1; i = edge[i].next)
+	if(!edge[i].flag)
+	{
+		edge[i].flag = true;
+		dfs(edge[i].to);
+		ans[cnt++] = edge[i].index;
+	}
+}
+int main()
+{
+	int T,n;
+	scanf("%d",&T);
+	while(T--)
+	{
+		scanf("%d",&n);
+		for(int i = 0; i < n; i++)
+			cin>>str[i];
+		sort(str,str+n);//要输出字典序最小的解，先按照字典序排序
+		init();
+		memset(in,0,sizeof(in));
+		memset(out,0,sizeof(out));
+		int start = 100;
+		for(int i = n-1; i >= 0; i--) //字典序大的先加入
+		{
+			int u = str[i][0] - 'a';
+			int v = str[i][str[i].length() - 1] - 'a';
+			addedge(u,v,i);
+			out[u]++;
+			in[v]++;
+			if(u < start)start = u;
+			if(v < start)start = v;
+		}
+		int cc1 = 0, cc2 = 0;
+		for(int i = 0; i < 26; i++)
+		{
+			if(out[i] - in[i] == 1)
+				{
+					cc1++;
+					start = i;//如果有一个出度比入度大 1 的点，就从这个点出发，
+				}
+			else if(out[i] - in[i] == -1)
+				cc2++;
+			else if(out[i] - in[i] != 0)
+				cc1 = 3;
+		}
+		if(! ( (cc1 == 0 && cc2 == 0) || (cc1 == 1 && cc2 == 1) ))
+		{
+			printf("***\n");//no solution
+			continue;
+		}
+		cnt = 0;
+		dfs(start);
+		if(cnt != n)//判断是否连通
+		{
+			printf("***\n");
+			continue;
+		}
+		for(int i = cnt-1; i >= 0; i--)
+		{
+			cout<<str[ans[i]];
+			if(i > 0)printf(".");
+			else printf("\n");
+		}
+	}
+}
+```
+##### 4.15.2 无向图
+```
+//O(n+m)
+//7个点编号0~6，n条边(u,v)，"+" 为正向通过(u->v)，"-" 为反向通过(v->u)，求欧拉回路 
+struct Edge{
+	int to,next;
+	int index;
+	int dir;
+	bool flag;
+} edge[220];
+int head[10],tot;
+void init()
+{
+	memset(head,-1,sizeof(head));
+	tot = 0;
+}
+void addedge(int u,int v,int index)
+{
+	edge[tot].to = v;
+	edge[tot].next = head[u];
+	edge[tot].index = index;
+	edge[tot].dir = 0;
+	edge[tot].flag = false;
+	head[u] = tot++;
+	edge[tot].to = u;
+	edge[tot].next = head[v];
+	edge[tot].index = index;
+	edge[tot].dir = 1;
+	edge[tot].flag = false;
+	head[v] = tot++;
+}
+int du[10];
+vector<int>ans;
+void dfs(int u)
+{
+	for(int i = head[u]; i != -1; i = edge[i].next)
+	if(!edge[i].flag )
+	{
+		edge[i].flag = true;
+		edge[i^1].flag = true;
+		dfs(edge[i].to);
+		ans.push_back(i);
+	}
+}
+int main()
+{
+	int n;
+	while(scanf("%d",&n) == 1)
+	{
+		init();
+		int u,v;
+		memset(du,0,sizeof(du));
+		for(int i = 1; i <= n; i++)
+		{
+			scanf("%d%d",&u,&v);
+			addedge(u,v,i);
+			du[u]++;
+			du[v]++;
+		}
+		int s = -1;
+		int cnt = 0;
+		for(int i = 0; i <= 6; i++)
+		{
+			if(du[i]&1)
+			{
+				cnt++;
+				s = i;
+			}
+			if(du[i] > 0 && s == -1)
+				s = i;
+		}
+		bool ff = true;
+		if(cnt != 0 && cnt != 2)
+		{
+			printf("No solution\n");
+			continue;
+		}
+		ans.clear();
+		dfs(s);
+		if(ans.size() != n)
+		{
+			printf("No solution\n");
+			continue;
+		}
+		for(int i = 0; i < ans.size(); i++)
+		{
+			printf("%d ",edge[ans[i]].index);
+			if(edge[ans[i]].dir == 0)printf("-\n");
+			else printf("+\n");
+		}
+	}
+}
+```
+##### 4.15.3 混合图
+```
+//O(n^2*m)
+const int MAXN = 210;
+//最大流部分ISAP
+const int MAXM = 20100;
+const int INF = 0x3f3f3f3f;
+struct Edge
+{
+	int to,next,cap,flow;
+} edge[MAXM];
+int tol;
+int head[MAXN];
+int gap[MAXN],dep[MAXN],pre[MAXN],cur[MAXN];
+void init()
+{
+	tol = 0;
+	memset(head,-1,sizeof(head));
+}
+void addedge(int u,int v,int w,int rw = 0)
+{
+	edge[tol].to = v;
+	edge[tol].cap = w;
+	edge[tol].next = head[u];
+	edge[tol].flow = 0;
+	head[u] = tol++;
+	edge[tol].to = u;
+	edge[tol].cap = rw;
+	edge[tol].next = head[v];
+	edge[tol].flow = 0;
+	head[v] = tol++;
+}
+int sap(int start,int end,int N)
+{
+	memset(gap,0,sizeof(gap));
+	memset(dep,0,sizeof(dep));
+	memcpy(cur,head,sizeof(head));
+	int u = start;
+	pre[u] = -1;
+	gap[0] = N;
+	int ans = 0;
+	while(dep[start] < N)
+	{
+		if(u == end)
+		{
+			int Min = INF;
+			for(int i = pre[u]; i != -1; i = pre[edge[i^1].to])
+				if(Min > edge[i].cap - edge[i].flow)
+					Min = edge[i].cap - edge[i].flow;
+			for(int i = pre[u]; i != -1; i = pre[edge[i^1].to])
+			{
+				edge[i].flow += Min;
+				edge[i^1].flow -= Min;
+			}
+			u = start;
+			ans += Min;
+			continue;
+		}
+		bool flag = false;
+		int v;
+		for(int i = cur[u]; i != -1; i = edge[i].next)
+		{
+			v = edge[i].to;
+			if(edge[i].cap - edge[i].flow && dep[v] + 1 == dep[u])
+			{
+				flag = true;
+				cur[u] = pre[v] = i;
+				break;
+			}
+		}
+		if(flag)
+		{
+			u = v;
+			continue;
+		}
+		int Min = N;
+		for(int i = head[u]; i != -1; i = edge[i].next)
+		if(edge[i].cap - edge[i].flow && dep[edge[i].to] < Min)
+		{
+			Min = dep[edge[i].to];
+			cur[u] = i;
+		}
+		gap[dep[u]]--;
+		if(!gap[dep[u]])return ans;
+		dep[u] = Min+1;
+		gap[dep[u]]++;
+		if(u != start)u = edge[pre[u]^1].to;
+	}
+	return ans;
+}
+//the end of 最大流部分
+int in[MAXN],out[MAXN];//每个点的出度和入度
+int main()
+{
+	int T;
+	int n,m;
+	scanf("%d",&T);
+	while(T--)
+	{
+		scanf("%d%d",&n,&m);
+		init();
+		int u,v,w;
+		memset(in,0,sizeof(in));
+		memset(out,0,sizeof(out));
+		while(m--)
+		{
+			scanf("%d%d%d",&u,&v,&w); // w=1：单向  w=0：双向 
+			out[u]++;
+			in[v]++;
+			if(w == 0)
+				addedge(u,v,1);
+		}
+		bool flag = true;
+		for(int i = 1; i <= n; i++)
+		{
+			if(out[i] - in[i] > 0)
+				addedge(0,i,(out[i] - in[i])/2);
+			else if(in[i] - out[i] > 0)
+				addedge(i,n+1,(in[i] - out[i])/2);
+			if((out[i] - in[i]) & 1)
+				flag = false;
+		}
+		if(!flag)
+		{
+			printf("impossible\n");
+			continue;
+		}
+		sap(0,n+1,n+2);
+		for(int i = head[0]; i != -1; i = edge[i].next)
+			if(edge[i].cap > 0 && edge[i].cap > edge[i].flow)
+			{
+				flag = false;
+				break;
+			}
+		if(flag)printf("possible\n");
+		else printf("impossible\n");
+	}
+}
+```
+### 4.16 图的绝对中心
+```
+/* 
+求图的绝对中心, g[][] 为邻接矩阵, 把没有的边权赋为 inf。返回一个 pair, 表示绝对中心在
+这条边 (s1, s2) 上，ds1, ds2 记录 s1 和 s2 距离绝对中心的距离, 按需返回。
+最小直径生成树就是求出每个点到绝对中心的距离，然后找最短路树。
+*/
+const int MAXN = 1000, inf = 1e9;
+void floyd(int n, int g[][MAXN], int d[][MAXN])
+{
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			d[i][j] = g[i][j];
+		}
+	}
+	for (int k = 0; k < n; ++k)
+	{
+		for (int i = 0; i < n; ++i)
+		{
+			for (int j = 0; j < n; ++j)
+			{
+				d[i][j] = std::min(d[i][j], d[i][k] + d[k][j]);
+			}
+		}
+	}
+}
+std::pair<int, int> KarivHakimi(int n, int g[][MAXN])
+{
+	static int rk[MAXN][MAXN], d[MAXN][MAXN];
+	double ds1 = 0, ds2 = 0;
+	floyd(n, g, d);
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j) rk[i][j] = j;
+		std::sort(rk[i], rk[i] + n, [&](int a, int b)
+		{
+			return d[i][a] < d[i][b];
+		});
+	}
+	int ret = inf, s1 = -1, s2 = -1;
+	for (int u = 0; u < n; ++u)
+	{
+		if (d[u][rk[u][n - 1]] * 2 < ret)
+		{
+			ret = d[u][rk[u][n - 1]] * 2;
+			s1 = s2 = u;
+			ds1 = ds2 = 0;
+		}
+		for (int v = 0; v < n; ++v)
+		{
+			if (g[u][v] == inf) continue;
+			for (int k = n - 1, i = n - 2; i >= 0; --i)
+			{
+				if (d[v][rk[u][i]] > d[v][rk[u][k]])
+				{
+					int tmp = d[u][rk[u][i]] + d[v][rk[u][k]] + g[u][v];
+					if (tmp < ret)
+					{
+						ret = tmp;
+						s1 = u, s2 = v;
+						ds1 = 0.5 * tmp - d[u][rk[u][i]];
+						ds2 = g[u][v] - ds1;
+					}
+					k = i;
+				}
+			}
+		}
+	}
+	return std::make_pair(s1, s2);
+}
+```
+### 4.17 虚树
+```
+//O(nlogn)
+const int N=100010;
+vector<int>v[N];
+struct edge{
+	int to,nxt;
+}e[500010];
+int hd[N],mark[N],ep,ti;
+void addedge(int x,int y)
+{
+	if(mark[x]!=ti)hd[x]=0,mark[x]=ti;
+	e[++ep]=(edge){y,hd[x]},hd[x]=ep;
+}
+int n,q[N],spc[N];
+int ptr,dfn[N],dep[N],sta[N],top;
+int st[17][N];
+bool cmp(int a,int b){return dfn[a]<dfn[b];}
+void dfs(int c,int f,int d)
+{
+	dfn[c]=++ptr;st[0][c]=f;dep[c]=d;
+	for(int i=0;i<v[c].size();++i)
+		if(v[c][i]!=f)dfs(v[c][i],c,d+1);
+}
+void _init()
+{
+	for(int i=1;i<17;++i)
+		for(int j=1;j<=n;++j)
+			st[i][j]=st[i-1][st[i-1][j]];
+}
+int lca(int x,int y)
+{
+	if(dep[x]<dep[y])swap(x,y);
+	for(int i=16;~i;--i)
+		if(dep[st[i][x]]>=dep[y])x=st[i][x];
+	for(int i=16;~i;--i)
+		if(st[i][x]!=st[i][y])x=st[i][x],y=st[i][y];
+	return x==y?x:st[0][x];
+}
+void virtree(int num)
+{
+	top=1;sta[1]=1;
+	int lc;
+	for(int i=1;i<=num;++i)
+	{
+		lc=lca(sta[top],q[i]);
+		while(dep[lc]<dep[sta[top]])
+		{
+			if(dep[sta[top-1]]<=dep[lc])
+			{
+				addedge(lc,sta[top]);
+				--top;if(sta[top]!=lc)sta[++top]=lc;
+				break;
+			}
+			addedge(sta[top-1],sta[top]);
+			--top;
+		}
+		sta[++top]=q[i];
+	}
+	while(top>1)
+	{
+		addedge(sta[top-1],sta[top]);
+		--top;
+	}
+}
+void solve()
+{
+	int num=in();
+	for(int i=1;i<=num;++i)q[i]=in(),spc[q[i]]=ti;
+	sort(q+1,q+num+1,cmp);
+	virtree(num);
+}
+int main()
+{
+	int i,x,y,m;
+	n=in();
+	for(i=1;i<n;++i)
+	{
+		x=in();y=in();
+		v[x].push_back(y);
+		v[y].push_back(x);
+	}
+	dfs(1,0,1);_init();
+	m=in();
+	while(m--)
+	{
+		++ti;ep=0;
+		solve();
+	}
+} 
+```
+### 4.18 点分治
+##### 4.18.1 点分治
+```
+//O(nlogn)
+//给定一棵有n个点的树,k次询问树上距离为q的点对是否存在
+int f[10002],sum,root,sz[10002],cnt;
+int n,k,q[110];
+bool done[10002],ans[110];
+set<int>mp;
+vector<int>v[10002],g[10002];
+void getfocus(int c,int fa)
+{
+	f[c]=0;sz[c]=1;
+	for(int i=0;i<v[c].size();++i)
+	if(v[c][i]!=fa&&!done[v[c][i]])
+	{
+		getfocus(v[c][i],c);
+		sz[c]+=sz[v[c][i]];
+		f[c]=max(f[c],sz[v[c][i]]);
+	}
+	f[c]=max(f[c],sum-sz[c]);
+	if(f[c]<f[root])root=c;
+}
+void check(int c,int fa,int d)
+{
+	for(int i=1;i<=k;++i)if(!ans[i])
+	{
+		if(mp.count(q[i]-d))ans[i]=1;
+	}
+	for(int i=0;i<v[c].size();++i)
+	if(v[c][i]!=fa&&!done[v[c][i]])
+	{
+		check(v[c][i],c,d+g[c][i]);
+	}
+}
+void getdis(int c,int fa,int d)
+{
+	mp.insert(d);
+	for(int i=0;i<v[c].size();++i)
+	if(v[c][i]!=fa&&!done[v[c][i]])
+	{
+		getdis(v[c][i],c,d+g[c][i]);
+	}
+}
+void work(int c)
+{
+	mp.clear();
+	done[c]=1;
+	for(int i=0;i<v[c].size();++i)
+	if(!done[v[c][i]])
+	{
+		check(v[c][i],0,g[c][i]);
+		getdis(v[c][i],0,g[c][i]);
+	}
+	for(int i=1;i<=k;++i)if(!ans[i])
+	{
+		if(mp.count(q[i]))ans[i]=1;
+	}
+	for(int i=0;i<v[c].size();++i)
+	if(!done[v[c][i]])
+	{
+		sum=sz[v[c][i]];root=0;
+		getfocus(v[c][i],0);
+		work(root);	
+	}
+}
+int main()
+{
+	int i,x,y,z;n=in();k=in();
+	for(i=1;i<n;i++)
+	{
+		x=in();y=in();z=in();
+		v[x].push_back(y);g[x].push_back(z);
+		v[y].push_back(x);g[y].push_back(z);
+	}
+	for(i=1;i<=k;i++)q[i]=in(),ans[i]=q[i]==0;
+	sum=n;f[0]=n+1;root=0;getfocus(1,0);
+	work(root);
+	for(i=1;i<=k;i++)puts(ans[i]?"Yes":"No");
+}
+```
+##### 4.18.2 点分树
+```
+//O(nlog2n)
+const int N=100010;
+struct edge{
+    int to,nxt;
+}e[N<<1];
+int hd[N],ptr;
+void addedge(int x,int y)
+{
+    e[++ptr]=(edge){y,hd[x]};hd[x]=ptr;
+}
+int n,m,ans;
+int rt,val[N],sz[N],fa[N][20],dis[N][20];
+int sum,g[N],dgr[N];
+bool done[N];
+struct BIT{
+    vector<int>tr;
+    void init(int sz){tr.resize(sz);}
+    void add(int x,int v){while(x<tr.size())tr[x]+=v,x+=x&-x;}
+    int query(int x)
+    {
+        if(x>=tr.size())x=tr.size()-1;
+        int re=0;while(x)re+=tr[x],x-=x&-x;return re;
+    }
+}b[N],fb[N];
+void getfocus(int c,int f)
+{
+    g[c]=0;sz[c]=1;
+    for(int i=hd[c];i;i=e[i].nxt)
+    if(!done[e[i].to]&&e[i].to!=f)
+    {
+        getfocus(e[i].to,c);
+        g[c]=max(g[c],sz[e[i].to]);
+        sz[c]+=sz[e[i].to];
+    }
+    g[c]=max(g[c],sum-sz[c]);
+    if(g[c]<g[rt])rt=c;
+}
+void getship(int c,int f,int x,int d)
+{
+    for(int i=hd[c];i;i=e[i].nxt)
+    {
+        int to=e[i].to;
+        if(!done[to]&&to!=f)
+        {
+            fa[to][++dgr[to]]=x;
+            dis[to][dgr[to]]=d;
+            getship(to,c,x,d+1);
+        }
+    }
+}
+void build(int c)
+{
+    done[c]=1;getship(c,0,c,1);
+    int _sum=sum;
+    b[c].init(_sum+1);
+    fb[c].init(_sum+1);
+    for(int i=hd[c];i;i=e[i].nxt)
+    {
+        int to=e[i].to;
+        if(!done[to])
+        {
+            if(sz[to]>sz[c])sum=_sum-sz[c];
+            else sum=sz[to];
+            rt=0;
+            getfocus(to,c);
+            build(rt);
+        }
+    }
+}
+void modify(int x,int v)
+{
+    for(int i=dgr[x];i;--i)
+    {
+        int c=fa[x][i+1],f=fa[x][i],d=dis[x][i];
+        if(d)
+        {
+            b[f].add(d,v);
+            fb[c].add(d,v);         
+        }
+    }
+}
+int query(int x,int k)
+{
+    int re=val[x]+b[x].query(k);
+    for(int i=dgr[x];i;--i)
+    {
+        int c=fa[x][i+1],f=fa[x][i],d=dis[x][i];
+        if(k>=d)
+        {
+            re+=val[f]; 
+            re+=b[f].query(k-d);
+            re-=fb[c].query(k-d);
+        }
+    }
+    return re;
+}
+int main()
+{
+    n=in();m=in();
+    for(int i=1;i<=n;++i)val[i]=in();
+    for(int x,y,i=1;i<n;++i)
+    {
+        x=in();y=in();
+        addedge(x,y);
+        addedge(y,x);
+    }
+    g[0]=n+1;rt=0;sum=n;getfocus(1,0);
+    build(rt);
+    for(int i=1;i<=n;++i)fa[i][dgr[i]+1]=i;
+    for(int i=1;i<=n;++i)modify(i,val[i]);
+    for(int i=1;i<=m;++i)
+    {
+        int opt=in(),x=in()^ans,y=in()^ans;
+        if(opt==0)//询问所有距 x 不超过 y 的点的点权和 
+        {
+            ans=query(x,y);
+            out(ans);putchar(10);
+        }
+        else if(opt==1)//修改 x 的点权为 y 
+        {
+            modify(x,y-val[x]);
+            val[x]=y;
+        }
+    }
+}
+```
+### 4.19 斯坦纳树
+```
+//O(n*3^k)
+/*
+n个点，m条双向边，有边权，k个关键点
+选定一些边来构成一个图，使得k个关键点连通，最小化边权和
+*/
+const int N=100010;
+const int M=200010;
+struct edge{
+	int to,nxt;
+	ll w;
+}e[M<<1];
+int hd[N],ptr;
+void addedge(int x,int y,ll w)
+{
+	e[++ptr]=(edge){y,hd[x],w};hd[x]=ptr;
+}
+int n,m,k;
+int p[7],pt;
+ll f[1<<5][N],g[1<<5];
+ll inf;
+int vis[N],ti;
+struct data{
+	int x;
+	ll dis;
+	bool operator < (const data &b)const
+	{
+		return dis>b.dis;
+	}
+};
+data mp(int x,ll dis)
+{
+	return (data){x,dis};
+}
+void dijkstra(int s)
+{
+	++ti;
+	ll *dis=f[s];
+	priority_queue<data>q;
+	for(ll i=1;i<=n;++i)if(dis[i]<inf)q.push(mp(i,dis[i]));
+	while(!q.empty())
+	{
+		int h=q.top().x;q.pop();
+		if(vis[h]==ti)continue;
+		vis[h]=ti;
+		for(int i=hd[h];i;i=e[i].nxt)
+		{
+			int to=e[i].to;
+			if(dis[to]>dis[h]+e[i].w)
+			{
+				dis[to]=dis[h]+e[i].w;
+				q.push(mp(to,dis[to]));
+			}
+		}
+	}
+}
+int main()
+{
+	n=in();k=in();m=in();
+	for(int i=1;i<=k;++i)p[pt++]=in();
+	for(int i=1;i<=m;++i)
+	{
+		ll x=in(),y=in(),w=in();
+		addedge(x,y,w);
+		addedge(y,x,w);
+	}
+	memset(f,127/2,sizeof f);inf=f[0][0];
+	memset(g,127/2,sizeof g);
+	for(int i=0;i<pt;++i)f[1<<i][p[i]]=0;
+	for(int e=1<<k,s=0;s<e;++s)
+	{
+		for(int i=1;i<=n;++i)
+			for(int t=s;t;t=(t-1)&s)
+				if(t<=(s^t))f[s][i]=min(f[s][i],f[t][i]+f[s^t][i]);
+		dijkstra(s);
+	}
+	int s=(1<<k)-1;
+	for(int i=1;i<=n;++i)g[s]=min(g[s],f[s][i]);
+	ll ans=g[(1<<k)-1];
+	printf("%lld\n",ans);
+}
+```
