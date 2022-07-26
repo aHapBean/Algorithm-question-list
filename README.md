@@ -5,6 +5,9 @@
   - 最长公共子序列
   - 可持久线段树可用来计数？
 
+- 模板整理进度
+  - 图论
+  - 字符串 TODO
 
 
 ## Algorithm-question-list
@@ -26,4 +29,7 @@ a list of some good programming questions I've done
 - ACM训练题
   - [round4 7.17](https://vjudge.net/contest/505273)
   - [round5 7.18](https://vjudge.net/contest/505363)
+  - [round6 7.19](https://vjudge.net/contest/505362)
+  - [round7 7.25](https://vjudge.net/contest/506622)
+  - [round8 7.26](https://vjudge.net/contest/506822)
   
