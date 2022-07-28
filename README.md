@@ -32,4 +32,6 @@ a list of some good programming questions I've done
   - [round6 7.19](https://vjudge.net/contest/505362)
   - [round7 7.25](https://vjudge.net/contest/506622)
   - [round8 7.26](https://vjudge.net/contest/506822)
+  - [round9 7.27](https://vjudge.net/contest/507048)
+    - [非常好的字符串题 哈希比较](https://vjudge.net/contest/507048#problem/E)
   
