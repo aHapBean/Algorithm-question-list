@@ -35,3 +35,6 @@ a list of some good programming questions I've done
   - [round9 7.27](https://vjudge.net/contest/507048)
     - [非常好的字符串题 哈希比较](https://vjudge.net/contest/507048#problem/E)
   
+  - 7.29 校选 有一些非常好的题
+
+  
