@@ -20,6 +20,8 @@ a list of some good programming questions I've done
   - ["逐个" (函数单调性](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1558)
   - [隐蔽单调栈 (删数字游戏](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1516)
   - [莫队板子题 (数数游戏](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1627)
+  - [挺好的一个板子题 Forest树的直径](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1116)
+
   
   - [思路 -> 解题 (应用题,dfs](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1642)
   
