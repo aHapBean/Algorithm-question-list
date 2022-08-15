@@ -22,9 +22,8 @@ a list of some good programming questions I've done
   - [莫队板子题 (数数游戏](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1627)
   - [挺好的一个板子题 Forest树的直径](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1116)
   - [难难题 图论](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1001)
-
-  
   - [思路 -> 解题 (应用题,dfs](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1642)
+  - [8.15 st + 二分 gcd,二分上下界问题 -> 答案具有单调性](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1509)
   
 - 洛谷
   - [简化版区间第k小](https://www.luogu.com.cn/problem/P1168)
