@@ -39,4 +39,7 @@ a list of some good programming questions I've done
   
   - 7.29 校选 有一些非常好的题
 
+- codeforces
+  - 8.18 div2
+    - [最大流应用题(较为隐蔽](https://codeforces.com/contest/1717/problem/F)
   
