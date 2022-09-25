@@ -24,6 +24,7 @@ a list of some good programming questions I've done
   - [难难题 图论](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1001)
   - [思路 -> 解题 (应用题,dfs](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1642)
   - [8.15 st + 二分 gcd,二分上下界问题 -> 答案具有单调性](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1509)
+  - [两个1-n序列转换 + 树状数组 9.25](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1593)
   
 - 洛谷
   - [简化版区间第k小](https://www.luogu.com.cn/problem/P1168)
