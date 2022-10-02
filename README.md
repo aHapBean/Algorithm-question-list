@@ -12,7 +12,8 @@
 
 ## Algorithm-question-list
 a list of some good programming questions I've done
-b 偶尔更新qwq
+\
+偶尔更新qwq
 
 - OJ
   - [逆序数对变种 -> 离散化 + 树状数组 (小v来组队 ](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1534)
@@ -27,7 +28,10 @@ b 偶尔更新qwq
   - [8.15 st + 二分 gcd,二分上下界问题 -> 答案具有单调性](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1509)
   - [两个1-n序列转换 + 树状数组 9.25](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1593)
   - [找递推规律 + 线段树优化 好题 www 10.2](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1686)
-  
+  - [最短路隐蔽题,一类隐蔽题](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1700)
+ 
+- 力扣
+  - [并查集好题 + 图论](https://leetcode.cn/problems/number-of-good-paths/)
 - 洛谷
   - [简化版区间第k小](https://www.luogu.com.cn/problem/P1168)
   
