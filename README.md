@@ -12,6 +12,7 @@
 
 ## Algorithm-question-list
 a list of some good programming questions I've done
+b 偶尔更新qwq
 
 - OJ
   - [逆序数对变种 -> 离散化 + 树状数组 (小v来组队 ](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1534)
