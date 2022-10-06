@@ -30,6 +30,7 @@ a list of some good programming questions I've done
   - [找递推规律 + 线段树优化 好题 www 10.2](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1686)
   - [最短路隐蔽题,一类隐蔽题](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1700)
   - [主席树好题 -> 历史版本的应用 10.3](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1705)
+  - [逆序对 + 组合数 + 折半搜索，情况比较复杂 TODO ! 10.6](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1018)
  
 - 力扣
   - [并查集好题 + 图论](https://leetcode.cn/problems/number-of-good-paths/)
