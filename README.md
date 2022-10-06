@@ -31,11 +31,13 @@ a list of some good programming questions I've done
   - [最短路隐蔽题,一类隐蔽题](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1700)
   - [主席树好题 -> 历史版本的应用 10.3](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1705)
   - [逆序对 + 组合数 + 折半搜索，情况比较复杂 TODO ! 10.6](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1018)
+  - [网络流的应用 填满棋盘](https://acm.sjtu.edu.cn/OnlineJudge/code?submit_id=195844)
  
 - 力扣
   - [并查集好题 + 图论](https://leetcode.cn/problems/number-of-good-paths/)
 - 洛谷
   - [简化版区间第k小](https://www.luogu.com.cn/problem/P1168)
+  - [最小割 网络流应用 方格取数](https://www.luogu.com.cn/problem/P2774)
   
 - ACM训练题
   - [round4 7.17](https://vjudge.net/contest/505273)
