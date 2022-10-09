@@ -33,6 +33,8 @@ a list of some good programming questions I've done
   - [逆序对 + 组合数 + 折半搜索，情况比较复杂 TODO ! 10.6](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1018)
   - [网络流的应用 填满棋盘](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1572)
   - [TODO 快速傅里叶变换](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1227)
+  - [fibnacci + 线段树 10.9](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1701)
+  - [线性基 子集异或和均不为0 “高斯消元”](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1703)
  
 - 力扣
   - [并查集好题 + 图论](https://leetcode.cn/problems/number-of-good-paths/)
