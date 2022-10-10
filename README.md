@@ -35,6 +35,7 @@ a list of some good programming questions I've done
   - [TODO 快速傅里叶变换](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1227)
   - [fibnacci + 线段树 10.9](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1701)
   - [线性基 子集异或和均不为0 “高斯消元”](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1703)
+  - [区间出现次数超过一半的数 主席树 + 一半的特殊性质,*主席树能维护的历史信息应该是可叠加的那种](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1702)
  
 - 力扣
   - [并查集好题 + 图论](https://leetcode.cn/problems/number-of-good-paths/)
