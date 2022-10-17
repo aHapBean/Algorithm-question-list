@@ -36,6 +36,7 @@ a list of some good programming questions I've done
   - [fibnacci + 线段树 10.9](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1701)
   - [线性基 子集异或和均不为0 “高斯消元”](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1703)
   - [区间出现次数超过一半的数 主席树 + 一半的特殊性质,*主席树能维护的历史信息应该是可叠加的那种](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1702)
+  - [复杂公式题 分析问题后写 一道树状数组暴力题，能用n^2logn卡过?](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1687)
  
 - 力扣
   - [并查集好题 + 图论](https://leetcode.cn/problems/number-of-good-paths/)
