@@ -39,6 +39,9 @@ a list of some good programming questions I've done
   - [复杂公式题 分析问题后写 一道树状数组暴力题，能用n^2logn卡过?(x)其实是 nlnnlogn](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1687)
   - [01trie暴力好题 好好题 难写 但 AC](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1668)
   - [10.18 PPCA A 卷题 序列区间-1 不必要每次都减少最大的区间，认清这个误区后就能写出](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1630)
+  - [过去和现在的代码对比 1476]
+    - [过去](https://acm.sjtu.edu.cn/OnlineJudge/code?submit_id=129138)
+    - [现在](https://acm.sjtu.edu.cn/OnlineJudge/code?submit_id=206885)
 
 - PPCA 四次考试A卷链接
   - > [第一次](https://acm.sjtu.edu.cn/OnlineJudge/contest?contest_id=348)
