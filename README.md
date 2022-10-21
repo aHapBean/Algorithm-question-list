@@ -42,6 +42,7 @@ a list of some good programming questions I've done
   - [过去和现在的代码对比 1476](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1476)
     - [过去](https://acm.sjtu.edu.cn/OnlineJudge/code?submit_id=129138)
     - [现在](https://acm.sjtu.edu.cn/OnlineJudge/code?submit_id=206885)
+  - [树套树 www 权值线段树/树状数组 套线段树 不能pushdown不然可能MLE ? 一种新奇的线段树写法](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1723)
 
 - PPCA 四次考试A卷链接
   - > [第一次](https://acm.sjtu.edu.cn/OnlineJudge/contest?contest_id=348)
