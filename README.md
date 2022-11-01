@@ -15,6 +15,8 @@ a list of some good programming questions I've done
 \
 偶尔更新qwq
 
+- 上海CCPC [CF链接](https://codeforces.com/gym/103931/standings)
+
 - OJ
   - [逆序数对变种 -> 离散化 + 树状数组 (小v来组队 ](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1534)
   - [逆序数对变种 -> 思维题(排序](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1149)
