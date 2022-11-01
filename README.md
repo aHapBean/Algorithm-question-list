@@ -56,6 +56,7 @@ a list of some good programming questions I've done
 - 洛谷
   - [简化版区间第k小](https://www.luogu.com.cn/problem/P1168)
   - [最小割 网络流应用 方格取数](https://www.luogu.com.cn/problem/P2774)
+  - [LIS套皮好题 两维交点问题](https://www.luogu.com.cn/problem/P2782)
   
 - ACM训练题
   - [round4 7.17](https://vjudge.net/contest/505273)
