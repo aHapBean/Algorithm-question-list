@@ -47,6 +47,9 @@ a list of some good programming questions I've done
   - [树套树 www 权值线段树/树状数组 套线段树 不能pushdown不然可能MLE ? 一种新奇的线段树写法](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1723)
   - [差分约束好题 2022CCPC上海的题](https://acm.sjtu.edu.cn/OnlineJudge/problem?problem_id=1739)
     - 我写了篇blog<https://www.luogu.com.cn/blog/aHapBean/braket-query-ti-xie>
+  - [A班作业1-2022-2023-1](https://acm.sjtu.edu.cn/OnlineJudge/homework/370)
+  - [A班作业2-2022-2023-1](https://acm.sjtu.edu.cn/OnlineJudge/homework/386)
+  
 
 - PPCA 四次考试A卷链接
   - > [第一次](https://acm.sjtu.edu.cn/OnlineJudge/contest?contest_id=348)
