@@ -77,4 +77,6 @@ a list of some good programming questions I've done
 - codeforces
   - 8.18 div2
     - [最大流应用题(较为隐蔽](https://codeforces.com/contest/1717/problem/F)
-  
+- 蓝桥杯
+  - 刷题count
+  - [蓝桥杯题库](https://www.luogu.com.cn/problem/list?tag=363&page=1)
