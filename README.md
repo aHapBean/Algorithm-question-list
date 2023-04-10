@@ -80,3 +80,4 @@ a list of some good programming questions I've done
 - 蓝桥杯
   - 刷题count
   - [蓝桥杯题库](https://www.luogu.com.cn/problem/list?tag=363&page=1)
+  - upd 2023.4.8 蓝桥杯省赛 TO Update
