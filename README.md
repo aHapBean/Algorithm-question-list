@@ -85,3 +85,4 @@ a list of some good programming questions I've done
   - 省赛 2022.9.24
   - [rating](https://ac.nowcoder.com/acm/contest/41614#rank)
   - rk 13
+  - 赛时写假的题 过了94.83测例。。 [J题](https://ac.nowcoder.com/acm/contest/41614/J)
