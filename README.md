@@ -81,3 +81,7 @@ a list of some good programming questions I've done
   - 刷题count
   - [蓝桥杯题库](https://www.luogu.com.cn/problem/list?tag=363&page=1)
   - upd 2023.4.8 蓝桥杯省赛 TO Update
+- CCPC
+  - 省赛 2022.9.24
+  - [rating](https://ac.nowcoder.com/acm/contest/41614#rank)
+  - rk 13
