@@ -86,3 +86,6 @@ a list of some good programming questions I've done
   - [rating](https://ac.nowcoder.com/acm/contest/41614#rank)
   - rk 13
   - 赛时写假的题 过了94.83测例。。 [J题](https://ac.nowcoder.com/acm/contest/41614/J)
+- 科协周赛
+  - 大三上第一次周赛
+    - 一类给定路径长度，让你求xx的问题，一般是找好角度枚举，预处理一定信息即可。！！[例题](https://www.luogu.com.cn/problem/T391449?contestId=141074)
