@@ -89,3 +89,5 @@ a list of some good programming questions I've done
 - 科协周赛
   - 大三上第一次周赛
     - 一类给定路径长度，让你求xx的问题，一般是找好角度枚举，预处理一定信息即可。！！[例题](https://www.luogu.com.cn/problem/T391449?contestId=141074)
+- 题解博客
+  - [唯一一篇题解博客](https://www.luogu.com.cn/blog/aHapBean/braket-query-ti-xie)
